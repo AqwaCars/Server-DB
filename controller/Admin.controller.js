@@ -13,6 +13,22 @@ module.exports = {
       next(error);
     }
   },
+  getAgencyCars: async (req, res, next) => {
+    try {
+      const data = await db.Car.findAll({
+        where: {
+          Owner: req.params.name
+        },
+        order: [['createdAt', 'DESC']] // Add this line to sort by createdAt in descending order
+      
+      });
+      if (data) {
+        res.json(data);
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
   SignUpAdmin: async (req, res, next) => {
     const NameCheck = await Admin.findAll({
       where: {
@@ -53,7 +69,7 @@ module.exports = {
     }
   },
   // checks if a Admin exists using email
-  emailLogin: async (req, res,next) => {
+  emailLogin: async (req, res, next) => {
     try {
       console.log(req.body);
       const admin = await Admin.findOne({ where: { email: req.body.email } });
@@ -67,17 +83,17 @@ module.exports = {
       ) {
         return res.status(401).json("wrong password");
       }
-      console.log("respone for login",await bcrypt.compare(req.body.password, admin.dataValues.password))
+      console.log("respone for login", await bcrypt.compare(req.body.password, admin.dataValues.password))
       const token = jwt.sign(admin.dataValues, process.env.JWT_SECRET_KEY);
       res.status(200).send(token);
     } catch (err) {
-       next(err)
+      next(err)
     }
   },
   // gets Admin token from the front to verify it and sends it back to front
-  handleToken: async (req, res,next) => {
+  handleToken: async (req, res, next) => {
     try {
-      console.log("lllllllllllllllllllllllllll",req.body);
+      console.log("lllllllllllllllllllllllllll", req.body);
       const response = jwt.verify(req.body.token, process.env.JWT_SECRET_KEY);
       // delete response.password;
       res.status(200).json(response);
@@ -87,7 +103,7 @@ module.exports = {
   },
 
   // Get Admin by email
-  getAdminByEmail: async (req, res,next) => {
+  getAdminByEmail: async (req, res, next) => {
     try {
       const Admin = await Admin.findOne({ where: { email: req.params.email } });
       if (!Admin) {
@@ -95,12 +111,12 @@ module.exports = {
       }
       res.status(200).send("Admin exists");
     } catch (err) {
-     next(err);
+      next(err);
     }
   },
 
   // Get Admin by phone number
-  getAdminByPhoneNumber: async (req, res,next) => {
+  getAdminByPhoneNumber: async (req, res, next) => {
     try {
       const Admin = await Admin.findOne({
         where: { phoneNumber: req.params.phoneNumber },
@@ -110,12 +126,12 @@ module.exports = {
       }
       res.status(200).send("Admin exists");
     } catch (err) {
-     next(err);
+      next(err);
     }
   },
 
   // Get a specific Admin by ID
-  getAdminById: async (req, res,next) => {
+  getAdminById: async (req, res, next) => {
     const AdminId = req.params.id;
     try {
       const Admin = await Admin.findByPk(AdminId);
@@ -130,7 +146,7 @@ module.exports = {
   },
 
   // Update a Admin by ID
-  updateAdmin: async (req, res,next) => {
+  updateAdmin: async (req, res, next) => {
     const AdminId = req.params.id;
     try {
       const [updated] = await Admin.update(req.body, {
@@ -163,7 +179,7 @@ module.exports = {
       res.json(err);
     }
   },
-  getAllUsers: async (req, res,next) => {
+  getAllUsers: async (req, res, next) => {
     try {
       const allUsers = await db.User.findAll();
       res.send(allUsers);
@@ -171,11 +187,11 @@ module.exports = {
       next(error);
     }
   },
-  getAllCompanies: async (req, res,next) => {
+  getAllCompanies: async (req, res, next) => {
     try {
       const allCompanies = await db.User.findAll({
-        where:{
-          type:"company"
+        where: {
+          type: "company"
         }
       });
       res.send(allCompanies);
@@ -183,44 +199,44 @@ module.exports = {
       next(error);
     }
   },
-  getLimitedCompanies: async (req, res,next) => {
+  getLimitedCompanies: async (req, res, next) => {
     try {
-       const allCompanies = await db.User.findAll({
-         where: {
-           type: "company"
-         },
-         order: [['createdAt', 'DESC']], // Order by the 'createdAt' column in descending order
-         limit: 10 // Limit the results to the latest 10 companies
-       });
-       res.send(allCompanies);
+      const allCompanies = await db.User.findAll({
+        where: {
+          type: "company"
+        },
+        order: [['createdAt', 'DESC']], // Order by the 'createdAt' column in descending order
+        limit: 10 // Limit the results to the latest 10 companies
+      });
+      res.send(allCompanies);
     } catch (error) {
-       next(error);
+      next(error);
     }
-   },
-   
-  getAllCars: async (req, res,next) => {
+  },
+
+  getAllCars: async (req, res, next) => {
     try {
-       const allCars = await db.Car.findAll({
-       });
-       res.send(allCars);
+      const allCars = await db.Car.findAll({
+      });
+      res.send(allCars);
     } catch (error) {
-       next(error);
+      next(error);
     }
-   },
-   
-  getLimitedCars: async (req, res,next) => {
+  },
+
+  getLimitedCars: async (req, res, next) => {
     try {
-       const allCars = await db.Car.findAll({
-         order: [['createdAt', 'DESC']], // Order by the 'createdAt' column in descending order
-         limit: 10 // Limit the results to the latest 10 companies
-       });
-       res.send(allCars);
+      const allCars = await db.Car.findAll({
+        order: [['createdAt', 'DESC']], // Order by the 'createdAt' column in descending order
+        limit: 10 // Limit the results to the latest 10 companies
+      });
+      res.send(allCars);
     } catch (error) {
-       next(error);
+      next(error);
     }
-   },
-   
-  updateOneUserblockState: async (req, res,next) => {
+  },
+
+  updateOneUserblockState: async (req, res, next) => {
     try {
       const user = await db.User.findOne({ where: { id: req.params.id } });
       const oneUser = await db.User.update(

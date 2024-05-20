@@ -29,7 +29,7 @@ db.Media = require("./media.Model")(DataTypes, connection);
 db.Review = require("./reviews.Model")(DataTypes, connection);
 db.RoomChat = require("./roomChat.Model")(DataTypes, connection);
 db.History = require("./history.Model")(DataTypes, connection);
-db.Service = require("./service.Model")(DataTypes, connection);
+db.Booking = require("./booking.Model")(DataTypes, connection);
 db.Report = require("./reports.Model")(DataTypes, connection);
 db.BookMark = require("./bookMarks.Model")(DataTypes, connection);
 db.Request = require("./request.Model")(DataTypes, connection);
@@ -45,6 +45,8 @@ db.Request.belongsTo(db.User);
 
 db.BookedPeriods.hasOne(db.Car)
 db.Car.belongsTo(db.BookedPeriods)
+db.BookedPeriods.hasOne(db.User)
+db.User.belongsTo(db.BookedPeriods)
 
 // db.BookedPeriods.hasOne(db.User)
 // db.User.belongsTo(db.BookedPeriods)
@@ -52,8 +54,8 @@ db.Car.belongsTo(db.BookedPeriods)
 // db.Request.hasMany(db.Media);
 // db.Media.belongsTo(db.Request);
 
-db.Service.hasMany(db.User);
-db.User.belongsTo(db.Service);
+db.Booking.hasMany(db.User);
+db.User.belongsTo(db.Booking);
 
 db.Request.hasOne(db.Agency);
 db.Agency.belongsTo(db.Request);
@@ -82,8 +84,8 @@ db.Review.belongsTo(db.Car);
 // db.Car.hasMany(db.Service);
 // db.Service.belongsTo(db.Car);
 
-db.User.hasMany(db.Service);
-db.Service.belongsTo(db.User);
+db.User.hasMany(db.Booking);
+db.Booking.belongsTo(db.User);
 
 db.User.hasMany(db.Report);
 db.Report.belongsTo(db.User);
@@ -91,8 +93,8 @@ db.Report.belongsTo(db.User);
 db.User.hasMany(db.RoomChat);
 db.RoomChat.belongsTo(db.User);
 
-db.Car.hasOne(db.Service);
-db.Service.belongsTo(db.Car);
+db.Car.hasOne(db.Booking);
+db.Booking.belongsTo(db.Car);
 
 db.User.hasMany(db.Message);
 db.Message.belongsTo(db.User);

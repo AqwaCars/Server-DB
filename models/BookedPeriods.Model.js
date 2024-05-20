@@ -6,7 +6,12 @@ module.exports = (DataTypes, connection) => {
     },
     BookedPeriod: {
       type: DataTypes.DATEONLY,
+      unique:true
     },
+    UserId:{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    }
   });
 
   return BookedPeriods;

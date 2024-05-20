@@ -14,11 +14,13 @@ const {
   getAllCompanies,
   getAllCars,
   getLimitedCars,
-  getLimitedCompanies
+  getLimitedCompanies,
+  getAgencyCars
 } = require("../controller/Admin.controller");
 const express = require("express");
 const router = express.Router();
 
+router.get("/getAgencyCars/:name", getAgencyCars);
 router.post("/emailLogin", emailLogin);
 router.post("/useToken", handleToken);
 router.post("/SignUpAdmin", SignUpAdmin);

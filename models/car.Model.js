@@ -8,6 +8,10 @@ module.exports = (DataTypes, connection) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    media: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     price: {
       type: DataTypes.INTEGER,
       allowNull: true,

@@ -17,13 +17,15 @@ module.exports = {
             }]
           },
         ],
+        order: [['createdAt', 'DESC']] // Add this line to sort by createdAt in descending order
       });
-
+  
       res.status(200).send(allCars);
     } catch (error) {
       res.json(error);
     }
   },
+  
 
 
   CreateCar: async function (req, res,next) {
@@ -151,6 +153,9 @@ module.exports = {
   },
   updateCar: async function (req, res) {
     try {
+      if (!req.params.id) {
+        res.send(404).send({"message":"id not found"})
+      }
       const carId = req.params.id;
       const updatedCar = await db.Car.update(
         {
@@ -165,7 +170,8 @@ module.exports = {
 
       res.status(200).send(updatedCar);
     } catch (error) {
-      throw error;
+      res.status(500).send({"message":error})
+      console.log(JSON.stringify(error));
     }
   },
 
