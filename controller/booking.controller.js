@@ -16,9 +16,7 @@ module.exports = {
   getRentalHistory: async (req, res, next) => {
     try {
       const services = await db.Service.findAll({
-        where: {
-          acceptation: "accepted",
-        },
+      
         include: [db.User, "Car"], // Include associated users in the query
       });
       // const result = services.map(service => ({
@@ -66,7 +64,7 @@ module.exports = {
     }
   },
   CreateBooking: async function (req, res) {
-    const { CarId, UserId, startDate, endDate, amount, time } = req.body;
+    const { companyName,from , to ,CarId, UserId, startDate, endDate, amount, time,name,Email,phoneNumber,address,postalCode,city,flightNumber } = req.body;
     const conflictingRental = await db.Service.findOne({
       where: {
         CarId: CarId,
@@ -98,12 +96,22 @@ module.exports = {
     }
 
     const services = await db.Service.create({
+      from,
+      to,
+      name,
+      Email,
       CarId: CarId,
       UserId: UserId,
       startDate,
       endDate,
       amount,
       time: time || null,
+      phoneNumber,
+      address,
+      postalCode,
+      city,
+      flightNumber ,
+      companyName
     });
 
     for (const date of datesInRange) {
