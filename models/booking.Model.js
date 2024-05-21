@@ -1,5 +1,5 @@
 module.exports = (DataTypes, connection) => {
-  const Service = connection.define("Service", {
+  const Booking = connection.define("Booking", {
     destination: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -34,5 +34,5 @@ module.exports = (DataTypes, connection) => {
       allowNull: false,
     },
   });
-  return Service;
+  return Booking;
 };
