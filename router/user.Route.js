@@ -23,7 +23,9 @@ const {
   sendWelcomeEmail,
   forgetPassword,
   changePassword,
-  SignUpCompany
+  SignUpCompany,
+  deconnection,
+  validatorUser
 } = require("../controller/user.Controller");
 
 // Define routes for user operations
@@ -55,5 +57,7 @@ router.post("/sendForgetCode", sendOTPForgetPassword)
 router.post("/verificationAccount", accountVerification)
 router.post("/forgetPassword", forgetPassword)
 router.post("/changePassword", changePassword)
+router.post("/deconnection", deconnection)
+router.post("/VerifyUser", validatorUser)
 
 module.exports = router;

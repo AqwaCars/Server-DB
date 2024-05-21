@@ -1,6 +1,10 @@
 module.exports = (DataTypes, connection) => {
-  const Service = connection.define("Service", {
-    destination: {
+  const Service = connection.define("Booking", {
+    from: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    to:{
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -12,15 +16,11 @@ module.exports = (DataTypes, connection) => {
       type: DataTypes.DATE,
       allowNull: false,
     },
-    UserId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     time: {
-      type: DataTypes.TIME,
+      type: DataTypes.STRING,
       allowNull: true,
     },
-    CarId: {
+    amount: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -29,7 +29,43 @@ module.exports = (DataTypes, connection) => {
       allowNull: false,
       defaultValue: "pending",
     },
-    amount: {
+    companyName:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    name:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    Email:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    phoneNumber:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    address:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    postalCode:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    city:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    flightNumber:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    UserId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    CarId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },

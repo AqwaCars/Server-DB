@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { db } = require("../models/index");
 const User = db.User;
+const Token = db.Token;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
@@ -255,7 +256,7 @@ module.exports = {
         return res.status(404).json({ error: "User not found" });
       }
       const isMatch = await bcrypt.compare(password, userValid.password);
-      if ((!isMatch && userValid.isBlocked) || userValid.isArchived) {
+      if ((isMatch && userValid.isBlocked) || userValid.isArchived) {
         return res.status(403).json({
           error: "Account is blocked or archived",
         });
@@ -270,14 +271,19 @@ module.exports = {
       }
 
       // const token = jwt.sign(userValid.id, process.env.JWT_SECRET_KEY);
-      const token = jwt.sign({ id: userValid.id }, process.env.JWT_SECRET_KEY);
-      const result = {
-        id:userValid.id,
-        email:userValid.email,
-        token,
-      };
-
-      res.status(200).json({ status: 200, result });
+      if (isMatch && userValid.isVerified && !userValid.isBlocked && !userValid.isArchived) {
+     
+        const token = await jwt.sign({ id: userValid.id }, process.env.JWT_SECRET_KEY);
+        
+        const result = {
+          id:userValid.id,
+          email:userValid.email,
+          token,
+        };
+        
+        const AddToken = await db.Token.create({token:token,UserId:userValid.id});
+        res.status(200).json({ status: 200, result });
+        };
     } catch (error) {
       console.error("Error during login:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -435,15 +441,17 @@ module.exports = {
       if (user.forgetPasswordOTP !== otpCode) {
         return res.status(400).json({ error: "Incorrect OTP code" });
       }
+      if(user.forgetPasswordOTP === otpCode){
 
-      const updateUser = await User.update(
-        { forgetPasswordOTP: null },
-        { where: { email } }
-      );
-
-      return res
-        .status(200)
-        .json({ message: "OTP code verified successfully" });
+        const updateUser = await User.update(
+          { forgetPasswordOTP: null },
+          { where: { email } }
+        );
+  
+        return res
+          .status(200)
+          .json({ message: "OTP code verified successfully" });
+      }
     } catch (error) {
       console.error("Error verifying OTP code:", error);
       return res.status(500).json({ error: "Internal server error" });
@@ -689,7 +697,7 @@ module.exports = {
   
       if (isMatch) {
         return res
-          .status(400)
+          .status(422)
           .json({ error: "Please choose a different password" });
       }
   
@@ -705,5 +713,45 @@ module.exports = {
       res.status(500).json({ error: "Internal server error" });
     }
   },
+  deconnection: async (req, res) => {
+    const { token } = req.body;
   
+    try {
+      const verifyToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      // console.log(verifyToken.id,"This is token");
+  
+      const tokens = await Token.findAll({ where: { UserId: verifyToken.id, token: token } });
+  
+      if (tokens.length > 0) {
+        await Token.destroy({ where: { UserId: verifyToken.id, token: token } });
+        res.status(200).json({ status: 200, message: 'Token successfully deleted' });
+      } else {
+        res.status(404).json({ error: 'Token not found' });
+      }
+    } catch (error) {
+      if (error.name === 'JsonWebTokenError') {
+        res.status(403).json({ error: 'Invalid token' });
+      } else {
+        console.error("Error during deconnection:", error);
+        res.status(500).json({ error: "Internal server error" });
+      }
+    }
+  },
+  validatorUser: async (req, res) => {
+    const { token } = req.body
+    try {
+      const verifyToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      console.log(verifyToken.id,"This is token");
+
+      const tokens = await Token.findAll({ where: { UserId: verifyToken.id, token: token } });
+      if (tokens.length > 0) {
+        res.status(200).json({ status: 200, message: 'Valid user' });
+      } else {
+        res.status(404).json({ error: 'Token not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
 };

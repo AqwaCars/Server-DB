@@ -31,7 +31,6 @@ const bookingRouter = require("./router/booking.Router");
 const paymentRouter = require("./router/payment.Route");
 const chatRouter = require("./router/chat.router");
 const routerNotification = require("./router/notificationRouter");
-const bookedPeriodsRouter = require("./router/bookPeriods");
 //!routers
 app.use("/api/car", carRouter);
 app.use("/api/users", userRouter);
@@ -46,7 +45,6 @@ app.use("/api/booking", bookingRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/notification", routerNotification);
-app.use("/api/bookedPeriods", bookedPeriodsRouter);
 // app.listen(5000, function () {
 //   console.log("Server is running on port 5000", port);
 // });
@@ -185,7 +183,7 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
