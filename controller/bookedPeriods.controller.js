@@ -54,11 +54,14 @@ module.exports = {
     addDate: async (req, res) => {
         try {
             // Directly use req.body.dates as it's guaranteed to be an array
+            console.log("HEYYYYYYYYYYYYYYYYYYYYYY",req.body);
             for (let date of req.body.dates) {
                 await db.BookedPeriods.create({
                     CarId: req.body.carId, // Assuming you're passing the CarId in the request body
-                    BookedPeriod: date,
-                    UserId: req.body.userId
+                    BookedPeriods: date,
+                    UserId: req.body.userId,
+                    rentalTime:req.body.rentalTime,
+                    returnTime:req.body.returnTime
                 });
             }
 
@@ -106,8 +109,8 @@ module.exports = {
             res.status(200).json({ data, message: "Dates fetched successfully" });
         } catch (er) {
             // Log the error and send a response indicating an internal server error
-            console.error("Error fetching dates:", er);
             res.status(500).json({ message: "An error occurred while fetching dates" });
+            console.error("Error fetching dates:", er);
         }
     }
 

@@ -12,11 +12,11 @@ const {
 } = require("../controller/CarController");
 const express = require("express");
 const carRouter = express.Router();
-carRouter.put("/cars/:id", updateCar);
+carRouter.put("/updateCar/:id", updateCar);
 carRouter.get("/allCars", getAllCars);
 carRouter.post("/byBrand", filterCarByBrand);
 carRouter.post("/newCar", CreateCar);
-carRouter.post("/imageCar", createImage);
+carRouter.post("/imageCar/:id", createImage);
 carRouter.get("/searchName/:model", searchCarByModel);
 carRouter.post("/filtredCar", filtredCar);
 carRouter.get("/carById/:id", searchCarById);
