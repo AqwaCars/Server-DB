@@ -46,8 +46,6 @@ db.Request.belongsTo(db.User);
 
 db.BookedPeriods.hasOne(db.Car)
 db.Car.belongsTo(db.BookedPeriods)
-db.BookedPeriods.hasOne(db.User)
-db.User.belongsTo(db.BookedPeriods)
 
 db.BookedPeriods.hasOne(db.User)
 db.User.belongsTo(db.BookedPeriods)
@@ -70,8 +68,8 @@ db.Media.belongsTo(db.Car);
 db.User.hasMany(db.Notifcation);
 db.Notifcation.belongsTo(db.User);
 
-db.User.hasMany(db.Car);
-db.Car.belongsTo(db.User);
+db.Admin.hasMany(db.Car);
+db.Car.belongsTo(db.Admin);
 
 db.User.hasMany(db.Review);
 db.Review.belongsTo(db.User);
