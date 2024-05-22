@@ -25,8 +25,13 @@ const {
   changePassword,
   SignUpCompany,
   deconnection,
-  validatorUser
+  validatorUser,
+  deconnectionFromDevices,
+  verifyCurrentPass,
+  changePasswordCRM,
+  changePasswordCRMVerif
 } = require("../controller/user.Controller");
+const { verify } = require("crypto");
 
 // Define routes for user operations
 router.get("/sort/:DataType", bringSortedData);
@@ -59,5 +64,9 @@ router.post("/forgetPassword", forgetPassword)
 router.post("/changePassword", changePassword)
 router.post("/deconnection", deconnection)
 router.post("/VerifyUser", validatorUser)
+router.post("/deconnectionFromDevices", deconnectionFromDevices)
+router.post("/verifyCurrentPass", verifyCurrentPass)
+router.post("/changePasswordCRM", changePasswordCRM)
+router.post("/changePasswordCRMVerif", changePasswordCRMVerif)
 
 module.exports = router;
