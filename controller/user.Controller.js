@@ -5,6 +5,7 @@ const Token = db.Token;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const { Sequelize, Op } = require('sequelize');
 
 // Controller methods for User
 module.exports = {
@@ -158,7 +159,79 @@ module.exports = {
   //     next(err);
   //   }
   // },
-  SignUpUser: async (req, res) => {
+  // original
+  // SignUpUser: async (req, res) => {
+  //   const {
+  //     userName,
+  //     phoneNumber,
+  //     password,
+  //     confirmPassword,
+  //     email,
+  //     dateOfBirth,
+  //     selfie,
+  //     drivingLicenseFront,
+  //     drivingLicenseBack,
+  //     passport,
+  //     cardIdBack,
+  //     cardIdFront
+  //   } = req.body;
+  //   if (
+  //     !userName ||
+  //     !phoneNumber ||
+  //     !password ||
+  //     !confirmPassword ||
+  //     !email ||
+  //     !dateOfBirth ||
+  //     !selfie ||
+  //     !drivingLicenseFront ||
+  //     !drivingLicenseBack ||
+  //     !cardIdFront ||
+  //     !cardIdBack ||
+  //     !passport
+  //   ) {
+  //     return res.status(422).json({ error: "fill all the details" });
+  //   }
+  //   try {
+  //     console.log("Before finding user");
+  //     const findUser = await User.findOne({ where: { email,isArchived:false } });
+  //     const findUserByPhone = await User.findOne({
+  //       where: { phoneNumber,isArchived:false },
+  //     });
+  //     if (findUser) {
+  //       return res.status(409).json({ error: "This email is already existed" });
+  //     } else if (findUserByPhone) {
+  //       return res
+  //         .status(409)
+  //         .json({ error: "This phone number is already existed" });
+  //     } else if (password !== confirmPassword) {
+  //       return res
+  //         .status(422)
+  //         .json({ error: "Password and confirm password are not match" });
+  //     } else {
+  //       const finalUser = await User.create({
+  //         userName,
+  //         phoneNumber,
+  //         password,
+  //         email,
+  //         dateOfBirth,
+  //         selfie,
+  //         drivingLicenseFront,
+  //         drivingLicenseBack,
+  //         cardIdFront,
+  //         cardIdBack,
+  //         passport
+  //       });
+  //       console.log(finalUser);
+  //       res.status(201).json(finalUser);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     return res
+  //       .status(500)
+  //       .json({ error: "Internal server error", details: error.message });
+  //   }
+  // },
+  SignUpUser : async (req, res) => {
     const {
       userName,
       phoneNumber,
@@ -170,7 +243,10 @@ module.exports = {
       drivingLicenseFront,
       drivingLicenseBack,
       passport,
+      cardIdBack,
+      cardIdFront,
     } = req.body;
+  
     if (
       !userName ||
       !phoneNumber ||
@@ -181,26 +257,22 @@ module.exports = {
       !selfie ||
       !drivingLicenseFront ||
       !drivingLicenseBack ||
-      !passport
+      !cardIdFront ||
+      !cardIdBack
     ) {
       return res.status(422).json({ error: "fill all the details" });
     }
+  
     try {
-      console.log("Before finding user");
-      const findUser = await User.findOne({ where: { email: email } });
-      const findUserByPhone = await User.findOne({
-        where: { phoneNumber: phoneNumber },
-      });
+      const findUser = await User.findOne({ where: { email, isArchived: false } });
+      const findUserByPhone = await User.findOne({ where: { phoneNumber, isArchived: false } });
+  
       if (findUser) {
         return res.status(409).json({ error: "This email is already existed" });
       } else if (findUserByPhone) {
-        return res
-          .status(409)
-          .json({ error: "This phone number is already existed" });
+        return res.status(409).json({ error: "This phone number is already existed" });
       } else if (password !== confirmPassword) {
-        return res
-          .status(422)
-          .json({ error: "Password and confirm password are not match" });
+        return res.status(422).json({ error: "Password and confirm password are not match" });
       } else {
         const finalUser = await User.create({
           userName,
@@ -211,18 +283,19 @@ module.exports = {
           selfie,
           drivingLicenseFront,
           drivingLicenseBack,
-          passport,
+          cardIdFront,
+          cardIdBack,
+          passport: passport || null, // Set passport to null if it's not provided
         });
-        console.log(finalUser);
+  
         res.status(201).json(finalUser);
       }
     } catch (error) {
       console.error(error);
-      return res
-        .status(500)
-        .json({ error: "Internal server error", details: error.message });
+      return res.status(500).json({ error: "Internal server error", details: error.message });
     }
   },
+  
   // emailLogin: async (req, res) => {
   //   try {
   //     const user = await User.findOne({ where: { email: req.body.email } });
@@ -250,15 +323,20 @@ module.exports = {
     }
 
     try {
-      const userValid = await User.findOne({ where: { email } });
+      const userValid = await User.findOne({ where: { email,isArchived:false } });
 
       if (!userValid) {
         return res.status(404).json({ error: "User not found" });
       }
       const isMatch = await bcrypt.compare(password, userValid.password);
-      if ((isMatch && userValid.isBlocked) || userValid.isArchived) {
+      if (isMatch && userValid.isBlocked) {
         return res.status(403).json({
-          error: "Account is blocked or archived",
+          error: "Account is blocked",
+        });
+      }
+      if (isMatch && userValid.isArchived) {
+        return res.status(403).json({
+          error: "User not found",
         });
       }
       if (isMatch && !userValid.isVerified) {
@@ -293,7 +371,7 @@ module.exports = {
     const { email, otpCode } = req.body;
 
     try {
-      const user = await User.findOne({ where: { email } });
+      const user = await User.findOne({ where: { email,isArchived:false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -334,7 +412,7 @@ module.exports = {
     });
 
     try {
-      const user = await User.findOne({ where: { email } });
+      const user = await User.findOne({ where: { email,isArchived:false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -372,7 +450,7 @@ module.exports = {
     });
 
     try {
-      const user = await User.findOne({ where: { email } });
+      const user = await User.findOne({ where: { email,isArchived:false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -410,7 +488,7 @@ module.exports = {
     });
 
     try {
-      const user = await User.findOne({ where: { email } });
+      const user = await User.findOne({ where: { email,isArchived:false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -433,7 +511,7 @@ module.exports = {
     const { email, otpCode } = req.body;
 
     try {
-      const user = await User.findOne({ where: { email } });
+      const user = await User.findOne({ where: { email,isArchived:false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -687,7 +765,7 @@ module.exports = {
           .json({ error: "New password and confirm password do not match" });
       }
   
-      const user = await User.findOne({ where: { email } });
+      const user = await User.findOne({ where: { email,isArchived:false } });
   
       if (!user) {
         return res.status(404).json({ error: "User not found" });
@@ -708,6 +786,45 @@ module.exports = {
       );
   
       res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  verifyCurrentPass: async (req, res) => {
+    const { email, newPassword, confirmPassword } = req.body;
+  
+    try {
+      if (!email || !newPassword || !confirmPassword) {
+        return res
+          .status(400)
+          .json({
+            error: "Please provide email, new password, and confirm password",
+          });
+      }
+  
+      if (newPassword !== confirmPassword) {
+        return res
+          .status(422)
+          .json({ error: "New password and confirm password do not match" });
+      }
+  
+      const user = await User.findOne({ where: { email,isArchived:false } });
+  
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      const isMatch = await bcrypt.compare(newPassword, user.password);
+  
+      if (isMatch) {
+        return res
+          .status(422)
+          .json({ error: "Please choose a different password" });
+      }
+        res.status(200).json({ message: "You can change your password" });
+      
+  
     } catch (error) {
       console.error("Error changing password:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -752,6 +869,119 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error: "Internal server error" });
     }
+  },
+   deconnectionFromDevices : async (req, res) => {
+    const { email } = req.body;
+  
+    try {
+      const user = await User.findOne({ where: { email,isArchived:false } });
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      await Token.destroy({ where: { UserId: user.id } });
+  
+      res.status(200).json({ message: 'All tokens deleted successfully' });
+    } catch (error) {
+      console.error('Error during token deletion:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  },
+  changePasswordCRM : async (req, res) => {
+    const { id, currentPassword, newPassword, confirmPassword } = req.body;
+  
+    try {
+      if (!id || !currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({
+          error: "Please provide id, current password, new password, and confirm password",
+        });
+      }
+  
+      if (newPassword !== confirmPassword) {
+        return res.status(422).json({ error: "New password and confirm password do not match" });
+      }
+  
+      const user = await User.findOne({ where: { id, isArchived: false } });
+  
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+  
+      if (!isMatch) {
+        return res.status(422).json({ error: "Current password is incorrect" });
+      }
+  
+      if (currentPassword === newPassword) {
+        return res.status(422).json({ error: "New password must be different from current password" });
+      }
+  
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      const updateUser = await User.update(
+        { password: hashedNewPassword },
+        { where: { id } }
+      );
+  
+      res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  changePasswordCRMVerif : async (req, res) => {
+    const { id, currentPassword, newPassword, confirmPassword } = req.body;
+  
+    try {
+      if (!id || !currentPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({
+          error: "Please provide id, current password, new password, and confirm password",
+        });
+      }
+  
+      if (newPassword !== confirmPassword) {
+        return res.status(422).json({ error: "New password and confirm password do not match" });
+      }
+  
+      const user = await User.findOne({ where: { id, isArchived: false } });
+  
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+  
+      if (!isMatch) {
+        return res.status(422).json({ error: "Current password is incorrect" });
+      }
+  
+      if (currentPassword === newPassword) {
+        return res.status(422).json({ error: "New password must be different from current password" });
+      }
+  
+      res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  IdDeconnectionFromDevices : async (req, res) => {
+    const { id, token } = req.body;
+    try {
+      await Token.destroy({
+        where: {
+          UserId: id,
+          token: { [Sequelize.Op.ne]: token } 
+        }
+      });
+  
+      res.status(200).json({ message: 'All tokens except the specified one deleted successfully' });
+    } catch (error) {
+      console.error('Error during token deletion:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
   }
+  
 
 };
