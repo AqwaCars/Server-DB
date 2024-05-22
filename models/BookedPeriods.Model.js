@@ -12,9 +12,13 @@ module.exports = (DataTypes, connection) => {
       type: DataTypes.DATEONLY,
       unique:true
     },
-    UserId:{
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    rentalTime: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    returnTime: {
+      type: DataTypes.STRING,
+      allowNull: false
     }
   });
 

@@ -19,16 +19,16 @@ module.exports = {
         ],
         order: [['createdAt', 'DESC']] // Add this line to sort by createdAt in descending order
       });
-  
+
       res.status(200).send(allCars);
     } catch (error) {
       res.json(error);
     }
   },
-  
 
 
-  CreateCar: async function (req, res,next) {
+
+  CreateCar: async function (req, res, next) {
     try {
       const newCar = await db.Car.create(
         req.body
@@ -38,7 +38,7 @@ module.exports = {
       next(error);
     }
   },
-  createImage: async function (req, res,next) {
+  createImage: async function (req, res, next) {
     try {
       const image = await db.Media.create(
         req.body
@@ -153,24 +153,19 @@ module.exports = {
   },
   updateCar: async function (req, res) {
     try {
+      console.log("UPDATING CAR PROCESS ? DATA IS : " , req.body);
       if (!req.params.id) {
-        res.send(404).send({"message":"id not found"})
+        res.send(404).send({ "message": "id not found" })
       }
       const carId = req.params.id;
-      const updatedCar = await db.Car.update(
-        {
-          price: req.body.price,
-          priceWeekly: req.body.priceWeekly,
-          priceMonthly: req.body.priceMonthly,
-        },
-        {
-          where: { id: carId },
-        }
-      );
+      const updatedCar = await db.Car.update(req.body, {
+        where: { id: carId }
+      });
+      
 
       res.status(200).send(updatedCar);
     } catch (error) {
-      res.status(500).send({"message":error})
+      res.status(500).send({ "message": error })
       console.log(JSON.stringify(error));
     }
   },
