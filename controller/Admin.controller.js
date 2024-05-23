@@ -86,6 +86,7 @@ module.exports = {
       }
       console.log("respone for login", await bcrypt.compare(req.body.password, admin.dataValues.password))
       const token = await jwt.sign(admin.dataValues, process.env.JWT_SECRET_KEY);
+      console.log(token);
       res.status(200).send(token);
     } catch (err) {
       next(err)
