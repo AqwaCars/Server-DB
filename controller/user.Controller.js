@@ -398,44 +398,73 @@ module.exports = {
     }
   },
 
-  sendOTPVerification: async (req, res) => {
+  sendOTPVerification : async (req, res) => {
     const { email } = req.body;
     const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
+        service: "gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+        tls: {
+            rejectUnauthorized: false,
+        },
     });
 
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const updateUser = await User.update(
-        { verificationOTP: code },
-        { where: { email } }
-      );
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Account Verification Code",
-        text: `Your Account verification code is: ${code}`,
-      };
+        const user = await User.findOne({ where: { email, isArchived: false } });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        
+        // Generate a 6-digit OTP code
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-      await transporter.sendMail(mailOptions);
+        // Update the user with the new OTP code
+        await User.update({ verificationOTP: code }, { where: { email } });
 
-      console.log("Email sent successfully");
-      return res.status(200).json({ message: "Email sent successfully" });
+        // Define the HTML content of the email
+        const htmlContent = `
+        <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2">
+          <div style="margin: 50px auto; width: 70%; padding: 20px 0">
+            <div style="border-bottom: 1px solid #eee">
+              <img src="https://res.cloudinary.com/dl9cp8cwq/image/upload/fl_preserve_transparency/v1716470902/car_images/aqwa_cars_black_hpvbaw.jpg?_s=public-apps" alt="Your Brand Logo" style="max-width: 100%; display: block;" />
+            </div>
+            <p style="font-size: 1.1em">Hi ${user.userName},</p>
+            <p>Thank you for choosing aqwa Cars. Use the following OTP to complete your Sign Up procedures.</p>
+            <h2 style="background: #00466a; margin: 0 auto; width: max-content; padding: 0 10px; color: #fff; border-radius: 4px;">${code}</h2>
+            <p style="font-size: 0.9em;">Regards,<br />aqwa Cars</p>
+            <hr style="border: none; border-top: 1px solid #eee" />
+            <div style="float: right; padding: 8px 0; color: #aaa; font-size: 0.8em; line-height: 1; font-weight: 300">
+              <p>aqwa cars S.A.R.L</p>
+              <p>IMMEUBLE EL FAWZ, AV DU DIRHAM</p>
+            <p>LES BERGES DU LAC 2</p>
+            <p>TUNIS</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      
+
+        // Define the mail options
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Account Verification Code",
+            html: htmlContent,
+        };
+
+        // Send the email
+        await transporter.sendMail(mailOptions);
+
+        console.log("Email sent successfully");
+        return res.status(200).json({ message: "Email sent successfully" });
     } catch (error) {
-      return res.status(500).json({ error: "Failed to send email" });
+        console.error("Failed to send email:", error);
+        return res.status(500).json({ error: "Failed to send email" });
     }
-  },
+},
   sendOTPForgetPassword: async (req, res) => {
     const { email } = req.body;
     const transporter = nodemailer.createTransport({
@@ -459,11 +488,37 @@ module.exports = {
         { forgetPasswordOTP: code },
         { where: { email } }
       );
+
+
+      const htmlContent = `
+      <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2">
+        <div style="margin: 10px auto; width: 70%; padding: 20px 0">
+          <div style="border-bottom: 1px solid #eee">
+            <img src="https://res.cloudinary.com/dl9cp8cwq/image/upload/fl_preserve_transparency/v1716470902/car_images/aqwa_cars_black_hpvbaw.jpg?_s=public-apps" alt="Your Brand Logo" style="max-width: 100%; display: block;" />
+          </div>
+          <p style="font-size: 1.1em">Hi ${user.userName},</p>
+          <p>We received a request to reset your password. Use the following OTP to reset your password:</p>
+          <h2 style="background: #00466a; margin: 0 auto; width: max-content; padding: 0 10px; color: #fff; border-radius: 4px;">${code}</h2>
+          <p style="font-size: 0.9em;">If you didn't request a password reset, you can ignore this email.</p>
+          <p style="font-size: 0.9em;">Regards,<br />aqwa Cars</p>
+          <hr style="border: none; border-top: 1px solid #eee" />
+          <div style="float: right; padding: 8px 0; color: #aaa; font-size: 0.8em; line-height: 1; font-weight: 300">
+            <p>aqwa Cars S.A.R.L</p>
+            <p>IMMEUBLE EL FAWZ, AV DU DIRHAM</p>
+            <p>LES BERGES DU LAC 2</p>
+            <p>TUNIS</p>
+          </div>
+        </div>
+      </div>
+    `;
+    
+
+
       const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
         subject: "Reset Password Code",
-        text: `Your rest password code is: ${code}`,
+        html: htmlContent,
       };
 
       await transporter.sendMail(mailOptions);
@@ -492,11 +547,200 @@ module.exports = {
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
+
+      const htmlContent = `
+      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Welcome to aqwa Cars</title>
+  <style type="text/css">
+      @media only screen and (min-width:480px) {
+          .mj-column-per-100 { width:100%!important; }
+          .mj-column-per-33 { width:33.333333333333336%!important; }
+          .mj-column-per-50 { width:50%!important; }
+          .mj-column-per-8 { width:8%!important; }
+          .mj-column-px-600 { width:600px!important; }
+      }
+  </style>
+</head>
+<body>
+<div>
+  <!--[if mso | IE]>
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" align="center" style="width:600px;">
+      <tr>
+          <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
+  <![endif]-->
+  <div style="margin:0px auto;max-width:600px;"><table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0px;width:100%;" align="center" border="0"><tbody><tr><td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:20px 0px;"><!--[if mso | IE]>
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td style="vertical-align:top;width:600px;">
+      <![endif]--><div class="mj-column-per-100 outlook-group-fix" style="vertical-align:top;display:inline-block;direction:ltr;font-size:13px;text-align:left;width:100%;"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:0px;padding-right:0px;padding-left:0px;" align="center"><table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border-spacing:0px;" align="center" border="0"><tbody><tr><td style="width:600px;"><img alt="" title="" height="auto" src="https://app.kometsales.com/img/template/email-welcome/header.jpg" style="border:none;border-radius:;display:block;outline:none;text-decoration:none;width:100%;height:auto;" width="600"></td></tr></tbody></table></td></tr></tbody></table></div><!--[if mso | IE]>
+      </td></tr></table>
+      <![endif]--></td></tr></tbody></table></div><!--[if mso | IE]>
+  </td></tr></table>
+  <![endif]-->
+  <!--[if mso | IE]>
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" align="center" style="width:600px;">
+      <tr>
+          <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
+  <![endif]--><div style="margin:0px auto;max-width:600px;"><table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0px;width:100%;" align="center" border="0"><tbody><tr><td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:20px 0px;"><!--[if mso | IE]>
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td style="vertical-align:top;width:600px;">
+      <![endif]--><div class="mj-column-px-600 outlook-group-fix" style="vertical-align:top;display:inline-block;direction:ltr;font-size:13px;text-align:left;width:100%;"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="left"><div class="" style="cursor:auto;color:#117CA8;font-family:Helvetica;font-size:20px;font-weight:bold;line-height:22px;text-align:left;">Hi ${user.userName},</div></td></tr><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="left"><div class="" style="cursor:auto;color:#525252;font-family:Helvetica;font-size:16px;line-height:22px;text-align:left;">
+          Thank you for choosing Komet Sales as your technology business partner. Surely, everyone at <b>$company</b> will have the best user experience with our platform!
+      </div></td></tr><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="left"><div class="" style="cursor:auto;color:#525252;font-family:Helvetica;font-size:16px;line-height:22px;text-align:left;">
+          To access your account please visit <a href="https://www.kometsales.com" style="color:#117CA8;">www.kometsales.com</a> and use these credentials:
+      </div></td></tr><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="left"><div class="" style="cursor:auto;color:#525252;font-family:Helvetica;font-size:16px;line-height:22px;text-align:left;">
+          <b>Account #:</b> $accountNumber
+          <br>
+          <b>Username:</b> $login
+          <br>
+          <b>Password:</b> $password
+      </div></td></tr><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="left"><div class="" style="cursor:auto;color:#525252;font-family:Helvetica;font-size:16px;line-height:22px;text-align:left;">
+          One of our Implementation Specialists will contact you to start with the process soon.
+      </div></td></tr>
+      <![endif]--><tr><td style="word-break:break-word;font-size:0px;padding:10px 0px 10px 35px;" align="left"><div class="" style="cursor:auto;color:#000000;font-family:Helvetica;font-size:12px;line-height:22px;text-align:left;">
+          <mj-raw>
+              <p style="margin: 0;"><img src="https://app.kometsales.com/img/template/email-welcome/icon-mail.png"> <span style="display: inline-block; height: 30px; line-height: 7px; vertical-align: middle;">Email us at <a href="mailto:info@aqua-cars.com" style="color:#117CA8;">info@aqua-cars.com</a> </span> </p>
+              <p style="margin: 0;"><img src="https://app.kometsales.com/img/template/email-welcome/icon-chat.png"> <span style="display: inline-block; height: 30px; line-height: 7px; vertical-align: middle;">Chat with the aqwa Cars Team.</span> </p>
+              <p style="margin: 0;"><img src="https://app.kometsales.com/img/template/email-welcome/icon-tel.png"> <span style="display: inline-block; height: 30px; line-height: 7px; vertical-align: middle;">Call us at +216 93 933 343</span> </p>
+              <mj-raw>
+              </mj-raw></mj-raw></div></td></tr></tbody></table></div><!--[if mso | IE]>
+      </td><td style="vertical-align:top;width:300px;">
+      <![endif]-->
+  </td></tr></table>
+ 
+                      </tbody></table><!--CloserSectionTable-->
+                      
+                     <!--SpacerTable-->
+
+                      
+  <table id="AppBadgeTable" border="0" cellspacing="0" cellpadding="0" width="100%" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">
+      <tbody><tr>
+          <td align="right" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;">
+              <a href="https://itunes.apple.com/app/apple-store/id447374873?mt=8" target="_blank" style="font-size:16px;line-height:1.5;font-weight:bold;color:#76B71A;text-align:center;">
+                  <img alt="App Store" class="image_fix" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;border:none;display:block;float: right;" height="45" width="139" border="0" src="https://s3.amazonaws.com/static.komoot.de/email/appstore/appstore-en@2x.png"></a>
+          </td>
+          <td width="10" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;"></td>
+          <td align="left" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;">
+              <a href="https://play.google.com/store/apps/details?id=de.komoot.android&amp;referrer=utm_source%3Dwelcome-mail%26utm_medium%3Demail%26utm_campaign%3Dwelcome-mails" target="_blank" style="font-size:16px;line-height:1.5;font-weight:bold;color:#76B71A;text-align:center;">
+                  <img alt="Play Store" class="image_fix" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;border:none;display:block;float: left;" height="45" width="139" border="0" src="https://s3.amazonaws.com/static.komoot.de/email/appstore/google-play-en@2x.png"></a>
+          </td>
+      </tr>
+  </tbody></table>
+
+                      
+                      <table id="SpacerTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#F2F2F2; width:100%!important;">
+                         <tbody><tr><td height="40" style="border-collapse: collapse;"></td></tr>
+                      </tbody></table><!--SpacerTable-->
+
+                      <table id="SocialTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; width:100%!important;">
+                         <tbody><tr>
+                            <td align="center" valign="top" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;">
+                               <table id="FollowUsTable" border="0" cellspacing="0" cellpadding="0" width="100%" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">
+                                  <tbody><tr>
+                                     <td width="60" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:1;font-weight:bold;color:#707070;text-align:center;"></td>
+                                     <td align="center" valign="middle" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:1;font-weight:bold;color:#707070;text-align:center;">
+                                        <table id="GreyLine" border="0" cellspacing="0" cellpadding="0" width="100%" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;background-color:#ECECEC;">
+                                           <tbody><tr>
+                                              <td height="1" width="200" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:1;font-weight:bold;color:#707070;text-align:center;"></td>
+                                           </tr>
+                                        </tbody></table>
+                                     </td>
+                                     <td width="120" align="center" valign="middle" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:1;font-weight:bold;color:#707070;text-align:center;">
+                                        
+                                           Follow Us
+                                        
+                                     </td>
+                                     <td align="center" valign="middle" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:1;font-weight:bold;color:#707070;text-align:center;">
+                                        <table id="GreyLine" border="0" cellspacing="0" cellpadding="0" width="100%" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;background-color:#ECECEC;">
+                                           <tbody><tr>
+                                              <td height="1" width="200" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:1;font-weight:bold;color:#707070;text-align:center;"></td>
+                                           </tr>
+                                        </tbody></table>
+                                     </td>
+                                     <td width="60" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:1;font-weight:bold;color:#707070;text-align:center;"></td>
+                                  </tr>
+                               </tbody></table>
+                            </td>
+                         </tr>
+                         <tr>
+                            <td height="30" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;"></td>
+                         </tr>
+                         <tr>
+                            <td style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;">
+                               <table id="SocialIconsTable" border="0" cellspacing="0" cellpadding="0" width="100%" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">
+                                  <tbody><tr>
+                                     <td style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;">&nbsp;</td>
+                                     <td width="36" align="center" valign="middle" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;">
+                                        <a href="https://www.tiktok.com/@aqwacars1" target="_blank" style="font-size:16px;line-height:1.5;font-weight:bold;color:#76B71A;text-align:center;">
+                                           <img alt="TikTok" class="image_fix" height="37" width="36" border="0" src="https://res.cloudinary.com/dl9cp8cwq/image/upload/fl_preserve_transparency/v1716478396/Your_paragraph_text_hxvro7.jpg?_s=public-apps" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;border:none;display:block;"></a>
+                                     </td>
+                                     <td width="30" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;"></td>
+                                     <td width="36" align="center" valign="middle" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;">
+                                        <a href="https://www.instagram.com/aqwa.cars/?hl=fr" target="_blank" style="font-size:16px;line-height:1.5;font-weight:bold;color:#76B71A;text-align:center;">
+                                           <img alt="Instagram" class="image_fix" height="37" width="36" border="0" src="https://s3.amazonaws.com/static.komoot.de/email/inspire/ic-social-instagram@2x.png" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;border:none;display:block;"></a>
+                                     </td>
+                                  
+                                     <!--<td width="30"></td>
+                                        <td width="36" align="center" valign="middle">
+                                        <a href="https://api.komoot.de/v007/mail/c?u=442528186864&t=welcome_mail_1&d=1259642336292563501&r=https%3A%2F%2Fplus.google.com%2F%2Bkomoot" target="_blank">
+                                        <img alt="Google+" class="image_fix" height="37" width="51" border="0" src="https://s3.amazonaws.com/static.komoot.de/email/inspire/ic-social-gplus@2x.png">
+                                        </a>
+                                        </td>-->
+                                        <td style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;">&nbsp;</td>
+                                  </tr>
+                               </tbody></table>
+                            </td>
+                         </tr>
+                      </tbody></table>
+
+                      <table id="SpacerTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#F2F2F2; width:100%!important;">
+                         <tbody><tr><td height="40" style="border-collapse: collapse;"></td></tr>
+                      </tbody></table><!--SpacerTable-->
+
+                      
+                         <table id="FooterTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#F2F2F2; width:100%!important;">
+                            <tbody><tr>
+                               <td width="20" style="border-collapse: collapse;"></td>
+                               <td align="center" style="border-collapse: collapse; font-family: Helvetica, Arial, sans-serif; font-size:12px; line-height:1.4; font-weight: normal; color: #999999; text-align: center;">
+
+                                  You’ve received this Welcome Email because you signed up for komoot. Tired of us already? You can <a target="_blank" style="color: #999999; text-decoration: underline;" href="#">unsubscribe</a> at any time. If you’d like to unsubscribe from all komoot communication, please change your <a target="_blank" style="color: #999999; text-decoration: underline;" href="#">settings</a>.
+
+                               </td>
+                               <td width="20" style="border-collapse: collapse;"></td>
+                            </tr>
+                            <tr><td colspan="3" height="20" style="border-collapse: collapse;"></td></tr>
+                            <tr>
+                               <td width="20" style="border-collapse: collapse;"></td>
+                               <td align="center" style="border-collapse: collapse; font-family: Helvetica, Arial, sans-serif; font-size:12px; line-height:1.4; font-weight: normal; color: #999999; text-align: center;">
+                                  <div class="vcard">
+                                     <span class="org fn">komoot GmbH</span> • <span class="adr"><span class="street-address">Friedrich-Wilhelm-Boelcke-Straße 2</span> • <span class="postal-code">14473</span> <span class="locality">Potsdam</span><br>
+                                        <a style="color: #999999; text-decoration: underline;" href="https://www.komoot.com?utm_source=welcome-mail&amp;utm_medium=email&amp;utm_content=footer-komoot&amp;utm_campaign=welcome-mails" target="_blank" class="url">www.komoot.de</a> • <a class="email" style="color: #999999; text-decoration: underline;" href="mailto:help@komoot.de" target="_blank">help@komoot.de</a></span>
+                                  </div>
+                               </td>
+                               <td width="20" style="border-collapse: collapse;"></td>
+                            </tr>
+                            <tr><td colspan="3" height="20" style="border-collapse: collapse;"></td></tr>
+                         </tbody></table><!--FooterTable-->
+                      
+
+                      <table id="SpacerTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#F2F2F2; width:100%!important;">
+                         <tbody><tr><td height="60" style="border-collapse: collapse;"></td></tr>
+                      </tbody></table><!--SpacerTable-->
+
+                   </td>
+                </tr>
+             </tbody></table><!--ColumnTable-->
+          </td>
+       </tr></body>
+</html>
+    `;
+
       const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
         subject: "Welcome To Aqua Cars!",
-        text: `Welcome ${user.userName} to Aqua Cars`,
+        html: htmlContent,
       };
 
       await transporter.sendMail(mailOptions);
@@ -936,7 +1180,7 @@ module.exports = {
     try {
       if (!id || !currentPassword || !newPassword || !confirmPassword) {
         return res.status(400).json({
-          error: "Please provide id, current password, new password, and confirm password",
+          error: "Please provide current password, new password, and confirm password",
         });
       }
   
@@ -981,7 +1225,85 @@ module.exports = {
       console.error('Error during token deletion:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
-  }
+  },
+  updatePhoneNumber : async (req, res) => {
+    const { phoneNumber, id } = req.body;
+  
+    if (!phoneNumber || !id) {
+      return res.status(400).json({ message: 'User ID and phone number are required' });
+    }
+  
+    try {
+      const result = await User.update(
+        { phoneNumber },
+        { where: { id } }
+      );
+  
+      const updated = result[0]
+  
+      if (updated) {
+        res.status(200).json({ message: 'Phone number updated successfully' });
+      } else {
+        res.status(404).json({ message: 'User not found' });
+      }
+    } catch (error) {
+      console.error('Error during phone number update:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  },
+   verifPassword : async (req, res) => {
+    try {
+      const { id, pass } = req.body;
+  
+      if (!pass) {
+        return res.status(400).json({
+          error: "Please provide your password",
+        });
+      }
+  
+      if (!id) {
+        return res.status(400).json({
+          error: "User id not found",
+        });
+      }
+  
+      const user = await User.findOne({ where: { id, isArchived: false } });
+  
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      const isMatch = await bcrypt.compare(pass, user.password);
+  
+      if (isMatch) {
+        return res.status(200).json({ message: "Password is correct" });
+      } else {
+        return res.status(422).json({ error: "Password is incorrect" });
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  idDeconnectionFromAllDevices : async (req, res) => {
+    const { id } = req.body;
+  
+    try {
+      const user = await User.findOne({ where: { id } });
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      await Token.destroy({ where: { UserId: user.id } });
+  
+      res.status(200).json({ message: 'All tokens deleted successfully' });
+    } catch (error) {
+      console.error('Error during token deletion:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  },
+
   
 
 };
