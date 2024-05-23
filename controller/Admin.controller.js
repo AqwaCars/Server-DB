@@ -79,12 +79,13 @@ module.exports = {
       // if (!admin.dataValues) {
       //   return res.status(404).json("Admin does not exist");
       // }
+      console.log("bcrypt comparing","password:",req.body.password,"admin password:",admin.dataValues.password);
       if (!(await bcrypt.compare(req.body.password, admin.dataValues.password))
       ) {
         return res.status(401).json("wrong password");
       }
       console.log("respone for login", await bcrypt.compare(req.body.password, admin.dataValues.password))
-      const token = jwt.sign(admin.dataValues, process.env.JWT_SECRET_KEY);
+      const token = await jwt.sign(admin.dataValues, process.env.JWT_SECRET_KEY);
       res.status(200).send(token);
     } catch (err) {
       next(err)

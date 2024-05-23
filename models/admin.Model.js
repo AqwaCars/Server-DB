@@ -21,9 +21,13 @@ module.exports = (DataTypes, connection) => {
         avatar: {
             type: DataTypes.STRING,
             allowNull: true
+        },
+        clearance: {
+            type: DataTypes.ENUM,
+            values: ['Level1', 'Level2', 'Level3'],
+            allowNull: false
         }
-        
-    })
+    })    
     Admin.beforeCreate((Admin, options) => {
         Admin.password = bcrypt.hashSync(Admin.password, saltRounds);
     });
