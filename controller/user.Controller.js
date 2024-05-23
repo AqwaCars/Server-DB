@@ -5,6 +5,7 @@ const Token = db.Token;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const { Sequelize, Op } = require('sequelize');
 
 // Controller methods for User
 module.exports = {
@@ -964,6 +965,23 @@ module.exports = {
       console.error("Error changing password:", error);
       res.status(500).json({ error: "Internal server error" });
     }
+  },
+  IdDeconnectionFromDevices : async (req, res) => {
+    const { id, token } = req.body;
+    try {
+      await Token.destroy({
+        where: {
+          UserId: id,
+          token: { [Sequelize.Op.ne]: token } 
+        }
+      });
+  
+      res.status(200).json({ message: 'All tokens except the specified one deleted successfully' });
+    } catch (error) {
+      console.error('Error during token deletion:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
   }
+  
 
 };
