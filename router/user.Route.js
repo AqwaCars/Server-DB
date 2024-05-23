@@ -29,7 +29,11 @@ const {
   deconnectionFromDevices,
   verifyCurrentPass,
   changePasswordCRM,
-  changePasswordCRMVerif
+  changePasswordCRMVerif,
+  IdDeconnectionFromDevices,
+  updatePhoneNumber,
+  verifPassword,
+  idDeconnectionFromAllDevices
 } = require("../controller/user.Controller");
 const { verify } = require("crypto");
 
@@ -68,5 +72,9 @@ router.post("/deconnectionFromDevices", deconnectionFromDevices)
 router.post("/verifyCurrentPass", verifyCurrentPass)
 router.post("/changePasswordCRM", changePasswordCRM)
 router.post("/changePasswordCRMVerif", changePasswordCRMVerif)
+router.post("/IdDeconnectionFromDevices", IdDeconnectionFromDevices)
+router.put("/updatePhoneNumber", updatePhoneNumber)
+router.post("/verifPassword", verifPassword)
+router.post("/idDeconnectionFromAllDevices", idDeconnectionFromAllDevices)
 
 module.exports = router;
