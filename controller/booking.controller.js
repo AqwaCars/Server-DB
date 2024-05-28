@@ -87,8 +87,8 @@ module.exports = {
       const conflictingRental = await db.Booking.findOne({
         where: {
           CarId: CarId,
-          startDate: { $lt: endDate },
-          endDate: { $gt: startDate },
+          startDate: { [Op.lt]: endDate },
+          endDate: { [Op.gt]: startDate },
           ...(time ? { time: time } : {}),
         }
       });
@@ -100,25 +100,10 @@ module.exports = {
       }
 
       // Get dates in range
-      const datesInRange = getDatesInRange(startDate, endDate);
+      const datesInRange = getDatesInRange(req.body.startDate, req.body.endDate);
 
-      // Check for unavailable dates
-      const unavailableDates = await db.BookedPeriods.findAll({
-        where: {
-          CarId,
-          BookedPeriods: datesInRange,
-          UserId,
-        }
-      });
-
-      if (unavailableDates.length > 0) {
-        return res
-          .status(400)
-          .json({ message: "Selected date range is not available." });
-      }
-
-      // Create the service
-      const service = await db.Booking.create({
+      // Create the booking
+      const booking = await db.Booking.create({
         from,
         to,
         name,
@@ -138,21 +123,63 @@ module.exports = {
       });
 
       // Create booked periods
-      for (const date of datesInRange) {
-        await db.BookedPeriods.create({
-          CarId,
-          UserId,
-          BookedPeriods: date,
-          rentalTime,
-          returnTime
-        });
+      const bookedPeriods = datesInRange.map(date => ({
+        CarId,
+        UserId,
+        BookedPeriods: date,
+        rentalTime,
+        returnTime
+      }));
+      console.log("HEY MF HAKIM3", bookedPeriods,"dates are :", datesInRange);
+      await db.BookedPeriods.bulkCreate(bookedPeriods);
+
+      return res.json(booking);
+    } catch (error) {
+      console.error("Error occurred while creating the booking:", JSON.stringify(error));
+
+      if (error.name === 'SequelizeValidationError') {
+        const validationErrors = error.errors.map(e => e.message);
+        return res.status(400).json({ message: "Validation error", errors: validationErrors });
       }
 
-      return res.json(service);
-    } catch (error) {
-      return res.status(500).json({ message: "An error occurred while creating the booking.", error: error.message });
+      return res.status(500).json({ message: "An error occurred while creating the booking.", error: error });
     }
   },
+
+
+  getAllBookingsByUserId: async (req, res) => {
+    const { UserId } = req.params;
+    const { acceptation } = req.body;
+  
+    try {
+      // Build the filter conditionally based on the acceptation status
+      let whereCondition = { UserId };
+      if (acceptation) {
+        whereCondition = { ...whereCondition, acceptation };
+      }
+  
+      const bookings = await db.Booking.findAll({
+        where: whereCondition,
+        include: [
+          {
+            model: db.Car,
+            as: 'Car'
+          }
+        ],
+      });
+  
+      if (!bookings || bookings.length === 0) {
+        return res.status(404).json({ message: "No bookings found for the given user." });
+      }
+  
+      return res.json(bookings);
+    } catch (error) {
+      console.error("Error occurred while fetching bookings:", JSON.stringify(error));
+      return res.status(500).json({ message: "An error occurred while fetching the bookings.", error: error });
+    }
+  },
+  
+  
 
   GetAvailableDatesForCar: async function (req, res) {
     try {

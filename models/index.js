@@ -14,7 +14,9 @@ connection
   });
 
 // connection.sync({ alter: true });
-// connection.sync({ force: true }); 
+// connection.sync({ force: true });
+
+
 
 const db = {};
 db.connection = connection;
@@ -110,8 +112,8 @@ db.History.belongsTo(db.Car);
 db.User.hasMany(db.BookMark);
 db.BookMark.belongsTo(db.User);
 
-db.BookMark.hasMany(db.Car);
-db.Car.belongsTo(db.BookMark);
+// db.BookMark.hasMany(db.Car);
+// db.Car.belongsTo(db.BookMark);
 
 db.User.hasMany(db.Token);
 db.Token.belongsTo(db.User);
