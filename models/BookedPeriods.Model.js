@@ -4,10 +4,6 @@ module.exports = (DataTypes, connection) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    UserId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     BookedPeriods: {
       type: DataTypes.DATEONLY,
       unique:false
