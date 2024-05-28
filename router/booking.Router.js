@@ -12,7 +12,8 @@ const {
   MarkDatesAsUnavailable,
   deletedServiceForUser,
   deletedServiceForagency,
-  calculateTotalPrice
+  calculateTotalPrice,
+  getAllBookingsByUserId
 } = require("../controller/booking.controller");
 const express = require("express");
 const bookingRouter = express.Router();
@@ -40,4 +41,6 @@ bookingRouter.get("/rentalHistory",getRentalHistory);
 bookingRouter.post("/avaibleCar", GetAvailableCars);
 bookingRouter.get("/allserviceforUser/:userId", GetAllServicesForUser);
 bookingRouter.post('/calculateTotalPrice', calculateTotalPrice);
+bookingRouter.get('/getAllByUserId/:UserId', getAllBookingsByUserId);
+
 module.exports = bookingRouter;

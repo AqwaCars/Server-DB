@@ -10,7 +10,7 @@ module.exports = (DataTypes, connection) => {
     },
     BookedPeriods: {
       type: DataTypes.DATEONLY,
-      unique:true
+      unique:false
     },
     rentalTime: {
       type: DataTypes.STRING,
