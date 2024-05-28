@@ -41,10 +41,10 @@ module.exports = {
           req.params.DataType === "A-Z-desc"
             ? ["userName", "DESC"]
             : req.params.DataType === "createdAt-desc"
-            ? ["createdAt", "DESC"]
-            : req.params.DataType === "carsRented-desc"
-            ? ["carsRented", "DESC"]
-            : null,
+              ? ["createdAt", "DESC"]
+              : req.params.DataType === "carsRented-desc"
+                ? ["carsRented", "DESC"]
+                : null,
         ],
       });
       res.json(list);
@@ -231,7 +231,7 @@ module.exports = {
   //       .json({ error: "Internal server error", details: error.message });
   //   }
   // },
-  SignUpUser : async (req, res) => {
+  SignUpUser: async (req, res) => {
     const {
       userName,
       phoneNumber,
@@ -246,7 +246,7 @@ module.exports = {
       cardIdBack,
       cardIdFront,
     } = req.body;
-  
+
     if (
       !userName ||
       !phoneNumber ||
@@ -262,11 +262,11 @@ module.exports = {
     ) {
       return res.status(422).json({ error: "fill all the details" });
     }
-  
+
     try {
       const findUser = await User.findOne({ where: { email, isArchived: false } });
       const findUserByPhone = await User.findOne({ where: { phoneNumber, isArchived: false } });
-  
+
       if (findUser) {
         return res.status(409).json({ error: "This email is already existed" });
       } else if (findUserByPhone) {
@@ -287,7 +287,7 @@ module.exports = {
           cardIdBack,
           passport: passport || null, // Set passport to null if it's not provided
         });
-  
+
         res.status(201).json(finalUser);
       }
     } catch (error) {
@@ -295,7 +295,7 @@ module.exports = {
       return res.status(500).json({ error: "Internal server error", details: error.message });
     }
   },
-  
+
   // emailLogin: async (req, res) => {
   //   try {
   //     const user = await User.findOne({ where: { email: req.body.email } });
@@ -323,7 +323,7 @@ module.exports = {
     }
 
     try {
-      const userValid = await User.findOne({ where: { email,isArchived:false } });
+      const userValid = await User.findOne({ where: { email, isArchived: false } });
 
       if (!userValid) {
         return res.status(404).json({ error: "User not found" });
@@ -350,18 +350,18 @@ module.exports = {
 
       // const token = jwt.sign(userValid.id, process.env.JWT_SECRET_KEY);
       if (isMatch && userValid.isVerified && !userValid.isBlocked && !userValid.isArchived) {
-     
+
         const token = await jwt.sign({ id: userValid.id }, process.env.JWT_SECRET_KEY);
-        
+
         const result = {
-          id:userValid.id,
-          email:userValid.email,
+          id: userValid.id,
+          email: userValid.email,
           token,
         };
-        
-        const AddToken = await db.Token.create({token:token,UserId:userValid.id});
+
+        const AddToken = await db.Token.create({ token: token, UserId: userValid.id });
         res.status(200).json({ status: 200, result });
-        };
+      };
     } catch (error) {
       console.error("Error during login:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -371,7 +371,7 @@ module.exports = {
     const { email, otpCode } = req.body;
 
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
+      const user = await User.findOne({ where: { email, isArchived: false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -398,33 +398,33 @@ module.exports = {
     }
   },
 
-  sendOTPVerification : async (req, res) => {
+  sendOTPVerification: async (req, res) => {
     const { email } = req.body;
     const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-        tls: {
-            rejectUnauthorized: false,
-        },
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
 
     try {
-        const user = await User.findOne({ where: { email, isArchived: false } });
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        
-        // Generate a 6-digit OTP code
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const user = await User.findOne({ where: { email, isArchived: false } });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
 
-        // Update the user with the new OTP code
-        await User.update({ verificationOTP: code }, { where: { email } });
+      // Generate a 6-digit OTP code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Define the HTML content of the email
-        const htmlContent = `
+      // Update the user with the new OTP code
+      await User.update({ verificationOTP: code }, { where: { email } });
+
+      // Define the HTML content of the email
+      const htmlContent = `
         <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2">
           <div style="margin: 50px auto; width: 70%; padding: 20px 0">
             <div style="border-bottom: 1px solid #eee">
@@ -444,27 +444,27 @@ module.exports = {
           </div>
         </div>
       `;
-      
-      
 
-        // Define the mail options
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Account Verification Code",
-            html: htmlContent,
-        };
 
-        // Send the email
-        await transporter.sendMail(mailOptions);
 
-        console.log("Email sent successfully");
-        return res.status(200).json({ message: "Email sent successfully" });
+      // Define the mail options
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Account Verification Code",
+        html: htmlContent,
+      };
+
+      // Send the email
+      await transporter.sendMail(mailOptions);
+
+      console.log("Email sent successfully");
+      return res.status(200).json({ message: "Email sent successfully" });
     } catch (error) {
-        console.error("Failed to send email:", error);
-        return res.status(500).json({ error: "Failed to send email" });
+      console.error("Failed to send email:", error);
+      return res.status(500).json({ error: "Failed to send email" });
     }
-},
+  },
   sendOTPForgetPassword: async (req, res) => {
     const { email } = req.body;
     const transporter = nodemailer.createTransport({
@@ -479,7 +479,7 @@ module.exports = {
     });
 
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
+      const user = await User.findOne({ where: { email, isArchived: false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -511,7 +511,7 @@ module.exports = {
         </div>
       </div>
     `;
-    
+
 
 
       const mailOptions = {
@@ -543,7 +543,7 @@ module.exports = {
     });
 
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
+      const user = await User.findOne({ where: { email, isArchived: false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -755,7 +755,7 @@ module.exports = {
     const { email, otpCode } = req.body;
 
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
+      const user = await User.findOne({ where: { email, isArchived: false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -763,13 +763,13 @@ module.exports = {
       if (user.forgetPasswordOTP !== otpCode) {
         return res.status(400).json({ error: "Incorrect OTP code" });
       }
-      if(user.forgetPasswordOTP === otpCode){
+      if (user.forgetPasswordOTP === otpCode) {
 
         const updateUser = await User.update(
           { forgetPasswordOTP: null },
           { where: { email } }
         );
-  
+
         return res
           .status(200)
           .json({ message: "OTP code verified successfully" });
@@ -993,7 +993,7 @@ module.exports = {
   },
   changePassword: async (req, res) => {
     const { email, newPassword, confirmPassword } = req.body;
-  
+
     try {
       if (!email || !newPassword || !confirmPassword) {
         return res
@@ -1002,33 +1002,33 @@ module.exports = {
             error: "Please provide email, new password, and confirm password",
           });
       }
-  
+
       if (newPassword !== confirmPassword) {
         return res
           .status(422)
           .json({ error: "New password and confirm password do not match" });
       }
-  
-      const user = await User.findOne({ where: { email,isArchived:false } });
-  
+
+      const user = await User.findOne({ where: { email, isArchived: false } });
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const isMatch = await bcrypt.compare(newPassword, user.password);
-  
+
       if (isMatch) {
         return res
           .status(422)
           .json({ error: "Please choose a different password" });
       }
-  
+
       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
       const updateUser = await User.update(
         { password: hashedNewPassword },
         { where: { email } }
       );
-  
+
       res.status(200).json({ message: "Password changed successfully" });
     } catch (error) {
       console.error("Error changing password:", error);
@@ -1037,7 +1037,7 @@ module.exports = {
   },
   verifyCurrentPass: async (req, res) => {
     const { email, newPassword, confirmPassword } = req.body;
-  
+
     try {
       if (!email || !newPassword || !confirmPassword) {
         return res
@@ -1046,29 +1046,29 @@ module.exports = {
             error: "Please provide email, new password, and confirm password",
           });
       }
-  
+
       if (newPassword !== confirmPassword) {
         return res
           .status(422)
           .json({ error: "New password and confirm password do not match" });
       }
-  
-      const user = await User.findOne({ where: { email,isArchived:false } });
-  
+
+      const user = await User.findOne({ where: { email, isArchived: false } });
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const isMatch = await bcrypt.compare(newPassword, user.password);
-  
+
       if (isMatch) {
         return res
           .status(422)
           .json({ error: "Please choose a different password" });
       }
-        res.status(200).json({ message: "You can change your password" });
-      
-  
+      res.status(200).json({ message: "You can change your password" });
+
+
     } catch (error) {
       console.error("Error changing password:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -1076,13 +1076,13 @@ module.exports = {
   },
   deconnection: async (req, res) => {
     const { token } = req.body;
-  
+
     try {
       const verifyToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
       // console.log(verifyToken.id,"This is token");
-  
+
       const tokens = await Token.findAll({ where: { UserId: verifyToken.id, token: token } });
-  
+
       if (tokens.length > 0) {
         await Token.destroy({ where: { UserId: verifyToken.id, token: token } });
         res.status(200).json({ status: 200, message: 'Token successfully deleted' });
@@ -1102,7 +1102,7 @@ module.exports = {
     const { token } = req.body
     try {
       const verifyToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-      console.log(verifyToken.id,"This is token");
+      console.log(verifyToken.id, "This is token");
 
       const tokens = await Token.findAll({ where: { UserId: verifyToken.id, token: token } });
       if (tokens.length > 0) {
@@ -1114,133 +1114,133 @@ module.exports = {
       res.status(500).json({ error: "Internal server error" });
     }
   },
-   deconnectionFromDevices : async (req, res) => {
+  deconnectionFromDevices: async (req, res) => {
     const { email } = req.body;
-  
+
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
-      
+      const user = await User.findOne({ where: { email, isArchived: false } });
+
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-  
+
       await Token.destroy({ where: { UserId: user.id } });
-  
+
       res.status(200).json({ message: 'All tokens deleted successfully' });
     } catch (error) {
       console.error('Error during token deletion:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
   },
-  changePasswordCRM : async (req, res) => {
+  changePasswordCRM: async (req, res) => {
     const { id, currentPassword, newPassword, confirmPassword } = req.body;
-  
+
     try {
       if (!id || !currentPassword || !newPassword || !confirmPassword) {
         return res.status(400).json({
           error: "Please provide id, current password, new password, and confirm password",
         });
       }
-  
+
       if (newPassword !== confirmPassword) {
         return res.status(422).json({ error: "New password and confirm password do not match" });
       }
-  
+
       const user = await User.findOne({ where: { id, isArchived: false } });
-  
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const isMatch = await bcrypt.compare(currentPassword, user.password);
-  
+
       if (!isMatch) {
         return res.status(422).json({ error: "Current password is incorrect" });
       }
-  
+
       if (currentPassword === newPassword) {
         return res.status(422).json({ error: "New password must be different from current password" });
       }
-  
+
       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
       const updateUser = await User.update(
         { password: hashedNewPassword },
         { where: { id } }
       );
-  
+
       res.status(200).json({ message: "Password changed successfully" });
     } catch (error) {
       console.error("Error changing password:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   },
-  changePasswordCRMVerif : async (req, res) => {
+  changePasswordCRMVerif: async (req, res) => {
     const { id, currentPassword, newPassword, confirmPassword } = req.body;
-  
+
     try {
       if (!id || !currentPassword || !newPassword || !confirmPassword) {
         return res.status(400).json({
           error: "Please provide current password, new password, and confirm password",
         });
       }
-  
+
       if (newPassword !== confirmPassword) {
         return res.status(422).json({ error: "New password and confirm password do not match" });
       }
-  
+
       const user = await User.findOne({ where: { id, isArchived: false } });
-  
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const isMatch = await bcrypt.compare(currentPassword, user.password);
-  
+
       if (!isMatch) {
         return res.status(422).json({ error: "Current password is incorrect" });
       }
-  
+
       if (currentPassword === newPassword) {
         return res.status(422).json({ error: "New password must be different from current password" });
       }
-  
+
       res.status(200).json({ message: "Password changed successfully" });
     } catch (error) {
       console.error("Error changing password:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   },
-  IdDeconnectionFromDevices : async (req, res) => {
+  IdDeconnectionFromDevices: async (req, res) => {
     const { id, token } = req.body;
     try {
       await Token.destroy({
         where: {
           UserId: id,
-          token: { [Sequelize.Op.ne]: token } 
+          token: { [Sequelize.Op.ne]: token }
         }
       });
-  
+
       res.status(200).json({ message: 'All tokens except the specified one deleted successfully' });
     } catch (error) {
       console.error('Error during token deletion:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
   },
-  updatePhoneNumber : async (req, res) => {
+  updatePhoneNumber: async (req, res) => {
     const { phoneNumber, id } = req.body;
-  
+
     if (!phoneNumber || !id) {
       return res.status(400).json({ message: 'User ID and phone number are required' });
     }
-  
+
     try {
       const result = await User.update(
         { phoneNumber },
         { where: { id } }
       );
-  
+
       const updated = result[0]
-  
+
       if (updated) {
         res.status(200).json({ message: 'Phone number updated successfully' });
       } else {
@@ -1251,30 +1251,30 @@ module.exports = {
       res.status(500).json({ message: 'Internal server error' });
     }
   },
-   verifPassword : async (req, res) => {
+  verifPassword: async (req, res) => {
     try {
       const { id, pass } = req.body;
-  
+
       if (!pass) {
         return res.status(400).json({
           error: "Please provide your password",
         });
       }
-  
+
       if (!id) {
         return res.status(400).json({
           error: "User id not found",
         });
       }
-  
+
       const user = await User.findOne({ where: { id, isArchived: false } });
-  
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const isMatch = await bcrypt.compare(pass, user.password);
-  
+
       if (isMatch) {
         return res.status(200).json({ message: "Password is correct" });
       } else {
@@ -1285,18 +1285,18 @@ module.exports = {
       return res.status(500).json({ error: "Internal server error" });
     }
   },
-  idDeconnectionFromAllDevices : async (req, res) => {
+  idDeconnectionFromAllDevices: async (req, res) => {
     const { id } = req.body;
-  
+
     try {
       const user = await User.findOne({ where: { id } });
-      
+
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-  
+
       await Token.destroy({ where: { UserId: user.id } });
-  
+
       res.status(200).json({ message: 'All tokens deleted successfully' });
     } catch (error) {
       console.error('Error during token deletion:', error);
@@ -1304,6 +1304,6 @@ module.exports = {
     }
   },
 
-  
+
 
 };

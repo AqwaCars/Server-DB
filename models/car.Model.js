@@ -20,10 +20,6 @@ module.exports = (DataTypes, connection) => {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    Owner: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
     Year: {
       type: DataTypes.STRING,
       allowNull: true,
