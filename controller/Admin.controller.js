@@ -242,7 +242,7 @@ module.exports = {
     try {
       const user = await db.User.findOne({ where: { id: req.params.id } });
       const oneUser = await db.User.update(
-        { stateBlocked: !user.stateBlocked },
+        { isBlocked: !user.isBlocked },
         {
           where: {
             id: user.id,
