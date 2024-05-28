@@ -6,23 +6,23 @@ module.exports = {
   getAllCars: async function (req, res) {
     try {
       const allCars = await db.Car.findAll({
-        include: [
-          { model: db.Media, as: "Media" },
-          {
-            model: db.Agency,
-            as: "Agency",
-            include: [{
-              model: db.User,
-              as: "User"
-            }]
-          },
-        ],
+        // include: [
+        //   // { model: db.Media, as: "Media" },
+        //   {
+        //     // model: db.Agency,
+        //     // as: "Agency",
+        //     // include: [{
+        //       model: db.User,
+        //       as: "User"
+        //     // }]
+        //   },
+        // ],
         order: [['createdAt', 'DESC']] // Add this line to sort by createdAt in descending order
       });
-
+      console.log("jihed this is server :", allCars);
       res.status(200).send(allCars);
     } catch (error) {
-      res.json(error);
+      res.send(400).json(JSON.stringify(error));
     }
   },
 
