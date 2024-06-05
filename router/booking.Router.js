@@ -21,6 +21,8 @@ const {
   CreateBookingAdmin,
   getAllBooking
 } = require("../controller/booking.controller");
+
+
 const express = require("express");
 const bookingRouter = express.Router();
 
@@ -28,7 +30,6 @@ bookingRouter.post("/createbooking", CreateBooking);
 bookingRouter.post("/CreateBookingAdmin", CreateBookingAdmin);
 
 bookingRouter.get("/unavailabledates/:oneCar", GetUnavailableDatesForCar);
-
 bookingRouter.delete(
   "/deletedServiceByAgency/:CarId/:id",
   deletedServiceForagency
@@ -38,7 +39,6 @@ bookingRouter.delete(
   deletedServiceForUser
 );
 bookingRouter.get("/availabledates/:oneCar", GetAvailableDatesForCar);
-
 bookingRouter.put("/updatebooking", UpdateService);
 bookingRouter.post("/agencyUpdateDate", MarkDatesAsUnavailable);
 bookingRouter.get("/allServiceForAgency/:agencyId", GetAllServicesForAgency);
