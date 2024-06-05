@@ -1,5 +1,6 @@
 const { db } = require("../models/index");
 const { Op } = require("sequelize");
+
 module.exports = {
     // getOneCar: async (req, res, next) => {
     //     try {
@@ -51,19 +52,33 @@ module.exports = {
     //         throw error; // Rethrow the error to handle it in an error handling middleware
     //     }
     // }
+    
     addDate: async (req, res) => {
         try {
             // Directly use req.body.dates as it's guaranteed to be an array
-            console.log("HEYYYYYYYYYYYYYYYYYYYYYY",req.body);
-            for (let date of req.body.dates) {
+            console.log("HEYYYYYYYYYYYYYYYYYYYYYY", req.body);
+
+            // Iterate over each date string in the array
+            for (let i = 0; i < req.body.dates.length; i++) {
+                // Parse the date string into a Date object
+                const dateStr = req.body.dates[i]; // Assuming dates is an array of date strings
+                const dateObj = new Date(Date.parse(dateStr));
+            
+                // Normalize the Date object to the start of the day (midnight)
+                dateObj.setHours(0, 0, 0, 0);
+            
+                // Now, dateObj represents the start of the day for the original date string
+                // Proceed to create the BookedPeriods entry with the normalized Date object
                 await db.BookedPeriods.create({
                     CarId: req.body.carId, // Assuming you're passing the CarId in the request body
-                    BookedPeriods: date,
+                    BookedPeriods: dateObj, // Use the normalized Date object here
                     UserId: req.body.userId,
-                    rentalTime:req.body.rentalTime,
-                    returnTime:req.body.returnTime
+                    rentalTime: req.body.rentalTime,
+                    returnTime: req.body.returnTime,
+                    BookingId:req.body.BookingId
                 });
             }
+            
 
             res.status(201).json({ message: "Dates added successfully" });
         } catch (error) {
@@ -71,6 +86,9 @@ module.exports = {
             res.status(500).json({ message: "An error occurred while adding dates" });
         }
     },
+
+    // Helper function to convert month names to month indices (0-indexed)
+
     removeRent: async (req, res) => {
         try {
             console.log(req.body);
@@ -78,8 +96,8 @@ module.exports = {
             // for (let date of req.body.dates) {
             await db.BookedPeriods.destroy({
                 where: {
-                    UserId:req.body.userId,
-                    CarId:req.body.carId
+                    UserId: req.body.userId,
+                    CarId: req.body.carId
                 }
             });
             // }

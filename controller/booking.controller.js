@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const {db} = require("../models/index");
+const { db } = require("../models/index");
 
 function getDatesInRange(startDate, endDate) {
   const dates = [];
@@ -130,34 +130,105 @@ module.exports = {
         rentalTime,
         returnTime
       }));
-      console.log("HEY MF HAKIM3", bookedPeriods,"dates are :", datesInRange);
+      // console.log("HEY MF HAKIM3", bookedPeriods,"dates are :", datesInRange);
       await db.BookedPeriods.bulkCreate(bookedPeriods);
 
       return res.json(booking);
     } catch (error) {
-      console.error("Error occurred while creating the booking:", JSON.stringify(error));
+      console.error("Error occurred while creating the booking:", error);
 
       if (error.name === 'SequelizeValidationError') {
         const validationErrors = error.errors.map(e => e.message);
         return res.status(400).json({ message: "Validation error", errors: validationErrors });
       }
 
-      return res.status(500).json({ message: "An error occurred while creating the booking.", error: error });
+      return res.status(500).json(JSON.stringify(error));
+    }
+  },
+  CreateBookingAdmin: async function (req, res) {
+    const {
+      endDate,
+      CarId,
+      UserId,
+      startDate,
+      amount,
+      time: returnTime,
+      name,
+      Email,
+      phoneNumber,
+      address,
+      acceptation,
+      postalCode,
+      city,
+    } = req.body;
+    try {
+      console.log("jijiiji", req.body.startDate, req.body.endDate);
+      // Check for conflicting rentals
+      const conflictingRental = await db.Booking.findOne({
+        where: {
+          CarId: CarId,
+          startDate: { [Op.lt]: endDate },
+          endDate: { [Op.gt]: startDate },
+          // time: req.body.time ? req.body.time : null,
+        }
+      });
+      console.log("zok omek", conflictingRental);
+      if (conflictingRental) {
+        return res
+          .status(400)
+          .json({ message: "Car is not available for the selected dates." });
+      }
+      // // Get dates in range
+      // const datesInRange = getDatesInRange(req.body.startDate, req.body.endDate);
+
+      // Create the booking
+      const booking = await db.Booking.create(req.body);
+
+      // Create booked periods
+      // const bookedPeriods = datesInRange.map(date => ({
+      //   CarId,
+      //   UserId,
+      //   BookedPeriods: date,
+      //   rentalTime,
+      //   returnTime
+      // }));
+      // // console.log("HEY MF HAKIM3", bookedPeriods,"dates are :", datesInRange);
+      // await db.BookedPeriods.bulkCreate(bookedPeriods);
+
+      return res.json(booking);
+    } catch (error) {
+      console.error("Error occurred while creating the booking:", error);
+
+      if (error.name === 'SequelizeValidationError') {
+        const validationErrors = error.errors.map(e => e.message);
+        return res.status(400).json({ message: "Validation error", errors: validationErrors });
+      }
+
+      return res.status(500).json(JSON.stringify(error));
     }
   },
 
-
+  getAllBooking: async (req,res,next) => {
+    try {
+      const response = await db.Booking.findAll({
+        where: { acceptation: "pending" },
+      });
+      res.status(200).send(response);
+    } catch (err) {
+      next(err)
+    }
+  },
   getAllBookingsByUserId: async (req, res) => {
     const { UserId } = req.params;
     const { acceptation } = req.body;
-  
+
     try {
       // Build the filter conditionally based on the acceptation status
       let whereCondition = { UserId };
       if (acceptation) {
         whereCondition = { ...whereCondition, acceptation };
       }
-  
+
       const bookings = await db.Booking.findAll({
         where: whereCondition,
         include: [
@@ -167,19 +238,19 @@ module.exports = {
           }
         ],
       });
-  
+
       if (!bookings || bookings.length === 0) {
         return res.status(404).json({ message: "No bookings found for the given user." });
       }
-  
+
       return res.json(bookings);
     } catch (error) {
       console.error("Error occurred while fetching bookings:", JSON.stringify(error));
       return res.status(500).json({ message: "An error occurred while fetching the bookings.", error: error });
     }
   },
-  
-  
+
+
 
   GetAvailableDatesForCar: async function (req, res) {
     try {
@@ -246,19 +317,19 @@ module.exports = {
           .json({ message: "Service is already accepted or rejected." });
       }
 
-      if (acceptation === "rejected") {
-        const startDate = service.startDate;
-        const endDate = service.endDate;
+      // if (acceptation === "rejected") {
+      //   const startDate = service.startDate;
+      //   const endDate = service.endDate;
 
-        const datesInRange = getDatesInRange(startDate, endDate);
+        // const datesInRange = getDatesInRange(startDate, endDate);
 
-        await db.Availability.destroy({
-          where: {
-            CarId: service.CarId,
-            date: datesInRange,
-          },
-        });
-      }
+        // await db.Availability.destroy({
+        //   where: {
+        //     CarId: service.CarId,
+        //     date: datesInRange,
+        //   },
+        // });
+      // }
 
       await service.update({ acceptation });
 
@@ -301,7 +372,7 @@ module.exports = {
             model: db.Media,
             where: { CarId: Sequelize.col("Car.id") },
           },
-          
+
         ],
         where: {
           "$Booking.id$": { [Sequelize.Op.not]: null },

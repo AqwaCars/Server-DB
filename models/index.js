@@ -49,14 +49,14 @@ db.Request.belongsTo(db.User);
 db.BookedPeriods.hasOne(db.Car)
 db.Car.belongsTo(db.BookedPeriods)
 
-db.User.hasMany(db.BookedPeriods)
-db.BookedPeriods.belongsTo(db.User)
+// db.User.hasMany(db.BookedPeriods)
+// db.BookedPeriods.belongsTo(db.User)
 
 db.Request.hasMany(db.Media);
 db.Media.belongsTo(db.Request);
 
-db.Booking.hasMany(db.User);
-db.User.belongsTo(db.Booking);
+// db.Booking.hasMany(db.User);
+// db.User.belongsTo(db.Booking);
 
 db.Booking.hasMany(db.BookedPeriods);
 db.BookedPeriods.belongsTo(db.Booking);

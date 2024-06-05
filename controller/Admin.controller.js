@@ -19,6 +19,35 @@ module.exports = {
         where: {
           UserId: req.params.id
         },
+
+        order: [['createdAt', 'DESC']] // Add this line to sort by createdAt in descending order
+
+      });
+      if (data) {
+        res.json(data);
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+  getAgencyReviews: async (req, res, next) => {
+    try {
+      const data = await db.Review.findAll({
+        where: {
+          UserId: req.params.id
+        },
+        include: [
+          {
+            model: db.Booking,
+          },
+          {
+            include: [
+              {
+                model: db.User,
+              },
+            ],
+          },
+        ],
         order: [['createdAt', 'DESC']] // Add this line to sort by createdAt in descending order
 
       });
@@ -208,7 +237,7 @@ module.exports = {
           type: "company"
         },
         order: [['createdAt', 'DESC']], // Order by the 'createdAt' column in descending order
-        limit: 10 // Limit the results to the latest 10 companies
+        limit: 6 // Limit the results to the latest 10 companies
       });
       res.send(allCompanies);
     } catch (error) {
@@ -230,7 +259,7 @@ module.exports = {
     try {
       const allCars = await db.Car.findAll({
         order: [['createdAt', 'DESC']], // Order by the 'createdAt' column in descending order
-        limit: 10 // Limit the results to the latest 10 companies
+        limit: 6 // Limit the results to the latest 10 companies
       });
       res.send(allCars);
     } catch (error) {
