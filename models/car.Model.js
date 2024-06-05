@@ -16,13 +16,9 @@ module.exports = (DataTypes, connection) => {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    totalPrice: {
+    deposit: {
       type: DataTypes.INTEGER,
       allowNull: true,
-    },
-    Owner: {
-      type: DataTypes.STRING,
-      allowNull: true
     },
     Year: {
       type: DataTypes.STRING,
@@ -32,13 +28,8 @@ module.exports = (DataTypes, connection) => {
       type: DataTypes.ENUM("Gasoline", "Diesel", "Electric"),
       allowNull: true,
     },
-    acceptation: {
-      type: DataTypes.ENUM("rejected", "accepted", "pending"),
-      allowNull: true,
-      defaultValue: "pending",
-    },
     Category: {
-      type: DataTypes.ENUM("Economic Class", "Luxery Car", "Sports"),
+      type: DataTypes.ENUM("Economy", "Premium", "Compact","SUV"),
     },
     Type: {
       type: DataTypes.ENUM("Automatic", "Manual"),

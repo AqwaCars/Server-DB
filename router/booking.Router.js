@@ -16,12 +16,16 @@ const {
   getFinishedBookings,
   handleLater,
   handleDontShowAgain,
-  handleConfirmRating
+  handleConfirmRating,
+  getAllBookingsByUserId,
+  CreateBookingAdmin,
+  getAllBooking
 } = require("../controller/booking.controller");
 const express = require("express");
 const bookingRouter = express.Router();
 
 bookingRouter.post("/createbooking", CreateBooking);
+bookingRouter.post("/CreateBookingAdmin", CreateBookingAdmin);
 
 bookingRouter.get("/unavailabledates/:oneCar", GetUnavailableDatesForCar);
 
@@ -48,4 +52,7 @@ bookingRouter.post('/getFinishedBookings', getFinishedBookings);
 bookingRouter.post('/handleLater', handleLater);
 bookingRouter.put('/handleDontShowAgain', handleDontShowAgain);
 bookingRouter.post('/handleConfirmRating', handleConfirmRating);
+bookingRouter.get('/getAllByUserId/:UserId', getAllBookingsByUserId);
+bookingRouter.get('/getAllBooking', getAllBooking);
+
 module.exports = bookingRouter;

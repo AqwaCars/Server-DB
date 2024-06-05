@@ -9,11 +9,11 @@ module.exports = (DataTypes, connection) => {
       allowNull: true,
     },
     startDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     endDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     time: {
@@ -64,6 +64,10 @@ module.exports = (DataTypes, connection) => {
     rated:{
       type: DataTypes.BOOLEAN,
       defaultValue:false
+    },
+    UserId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
     rating:{
       type: DataTypes.FLOAT,

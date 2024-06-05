@@ -43,10 +43,10 @@ module.exports = {
           req.params.DataType === "A-Z-desc"
             ? ["userName", "DESC"]
             : req.params.DataType === "createdAt-desc"
-            ? ["createdAt", "DESC"]
-            : req.params.DataType === "carsRented-desc"
-            ? ["carsRented", "DESC"]
-            : null,
+              ? ["createdAt", "DESC"]
+              : req.params.DataType === "carsRented-desc"
+                ? ["carsRented", "DESC"]
+                : null,
         ],
       });
       res.json(list);
@@ -1112,11 +1112,11 @@ module.exports = {
   },
   updatePhoneNumber: async (req, res) => {
     const { phoneNumber, id } = req.body;
-  
+
     if (!phoneNumber || !id) {
       return res.status(400).json({ message: "User ID and phone number are required" });
     }
-  
+
     try {
       // Check if the phone number already exists
       const existingUser = await User.findOne({ where: { phoneNumber } });

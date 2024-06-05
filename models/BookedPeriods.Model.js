@@ -1,16 +1,14 @@
+const { type } = require("os");
+
 module.exports = (DataTypes, connection) => {
   const BookedPeriods = connection.define("BookedPeriods", {
     CarId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    UserId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     BookedPeriods: {
       type: DataTypes.DATEONLY,
-      unique:true
+      unique: false
     },
     rentalTime: {
       type: DataTypes.STRING,
@@ -19,6 +17,10 @@ module.exports = (DataTypes, connection) => {
     returnTime: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    UserId: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   });
 
