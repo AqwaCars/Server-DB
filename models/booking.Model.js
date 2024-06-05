@@ -9,11 +9,11 @@ module.exports = (DataTypes, connection) => {
       allowNull: true,
     },
     startDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     endDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     time: {
@@ -63,7 +63,7 @@ module.exports = (DataTypes, connection) => {
     },
     UserId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     CarId: {
       type: DataTypes.INTEGER,

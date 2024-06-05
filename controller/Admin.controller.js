@@ -17,10 +17,39 @@ module.exports = {
     try {
       const data = await db.Car.findAll({
         where: {
-          Owner: req.params.name
+          UserId: req.params.id
         },
+
         order: [['createdAt', 'DESC']] // Add this line to sort by createdAt in descending order
-      
+
+      });
+      if (data) {
+        res.json(data);
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+  getAgencyReviews: async (req, res, next) => {
+    try {
+      const data = await db.Review.findAll({
+        where: {
+          UserId: req.params.id
+        },
+        include: [
+          {
+            model: db.Booking,
+          },
+          {
+            include: [
+              {
+                model: db.User,
+              },
+            ],
+          },
+        ],
+        order: [['createdAt', 'DESC']] // Add this line to sort by createdAt in descending order
+
       });
       if (data) {
         res.json(data);
@@ -79,7 +108,7 @@ module.exports = {
       // if (!admin.dataValues) {
       //   return res.status(404).json("Admin does not exist");
       // }
-      console.log("bcrypt comparing","password:",req.body.password,"admin password:",admin.dataValues.password);
+      console.log("bcrypt comparing", "password:", req.body.password, "admin password:", admin.dataValues.password);
       if (!(await bcrypt.compare(req.body.password, admin.dataValues.password))
       ) {
         return res.status(401).json("wrong password");
@@ -208,7 +237,7 @@ module.exports = {
           type: "company"
         },
         order: [['createdAt', 'DESC']], // Order by the 'createdAt' column in descending order
-        limit: 10 // Limit the results to the latest 10 companies
+        limit: 6 // Limit the results to the latest 10 companies
       });
       res.send(allCompanies);
     } catch (error) {
@@ -230,7 +259,7 @@ module.exports = {
     try {
       const allCars = await db.Car.findAll({
         order: [['createdAt', 'DESC']], // Order by the 'createdAt' column in descending order
-        limit: 10 // Limit the results to the latest 10 companies
+        limit: 6 // Limit the results to the latest 10 companies
       });
       res.send(allCars);
     } catch (error) {
@@ -241,6 +270,14 @@ module.exports = {
   updateOneUserblockState: async (req, res, next) => {
     try {
       const user = await db.User.findOne({ where: { id: req.params.id } });
+      if (!user.isBlocked) {
+        await db.Token.destroy({
+          where: {
+            id: user.id
+          }
+        }
+        )
+      }
       const oneUser = await db.User.update(
         { isBlocked: !user.isBlocked },
         {
@@ -249,7 +286,7 @@ module.exports = {
           },
         }
       );
-      res.send(oneUser);
+      res.status(200).send(oneUser);
     } catch (error) {
       next(error);
     }
