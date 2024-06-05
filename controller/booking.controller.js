@@ -79,7 +79,7 @@ module.exports = {
       city,
       flightNumber,
       rentalTime,
-      returnTime
+      returnTime,
     } = req.body;
 
     try {
@@ -90,7 +90,7 @@ module.exports = {
           startDate: { [Op.lt]: endDate },
           endDate: { [Op.gt]: startDate },
           ...(time ? { time: time } : {}),
-        }
+        },
       });
 
       if (conflictingRental) {
@@ -119,7 +119,7 @@ module.exports = {
         postalCode,
         city,
         flightNumber,
-        companyName
+        companyName,
       });
 
       // Create booked periods
@@ -372,7 +372,6 @@ module.exports = {
             model: db.Media,
             where: { CarId: Sequelize.col("Car.id") },
           },
-
         ],
         where: {
           "$Booking.id$": { [Sequelize.Op.not]: null },
@@ -388,11 +387,12 @@ module.exports = {
 
   GetAvailableCars: async function (req, res) {
     try {
-      const { startDate, endDate, price, typeOfFuel, Category, Type } = req.body;
+      const { startDate, endDate, price, typeOfFuel, Category, Type } =
+        req.body;
 
       const unavailableDates = await db.BookedPeriods.findAll({
         where: {
-          BookedPeriods: getDatesInRange(startDate, endDate)
+          BookedPeriods: getDatesInRange(startDate, endDate),
         },
         attributes: ["CarId"],
       });
@@ -517,7 +517,9 @@ module.exports = {
       const { startDate, endDate, CarId } = req.body;
 
       // Calculate the duration between start date and end date in days
-      const durationInDays = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
+      const durationInDays = Math.ceil(
+        (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
+      );
 
       // Retrieve the price of the car
       const car = await db.Car.findOne({ where: { id: CarId } });
@@ -531,4 +533,236 @@ module.exports = {
       res.json(error);
     }
   },
+  getFinishedBookings: async (req, res) => {
+    const { UserId } = req.body;
+
+    if (!UserId) {
+      return res.status(400).json({ message: "UserId is required" });
+    }
+
+    try {
+      const currentDate = new Date();
+
+      const finishedBookings = await db.Booking.findAll({
+        where: {
+          UserId,
+          endDate: { [Op.lte]: currentDate },
+          rated: false,
+          ratingTry: { [Op.lt]: 3 },
+        },
+        include:[
+          {model:db.Car,include:[{model:db.User}]}
+        ]
+      });
+
+      res.status(200).json(finishedBookings);
+    } catch (error) {
+      console.error("Error fetching finished bookings:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  handleLater: async (req, res) => {
+    const { bookingId } = req.body;
+
+    if (!bookingId) {
+      return res.status(400).json({ message: "bookingId is required" });
+    }
+
+    try {
+      const updateTrys = await db.Booking.increment("ratingTry", {
+        by: 1,
+        where: { id: bookingId },
+      });
+
+      if (updateTrys[0][1] === 0) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+      res.status(200).json({ message: "ratingTry incremented successfully" });
+    } catch (error) {
+      console.error("Error updating ratingTry:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  handleDontShowAgain: async (req, res) => {
+    const { bookingId } = req.body;
+
+    if (!bookingId) {
+      return res.status(400).json({ message: "bookingId is required" });
+    }
+
+    try {
+      const updateResult = await db.Booking.update(
+        { rated: true },
+        { where: { id: bookingId } }
+      )
+
+      if (updateResult[0] === 0) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+
+      res.status(200).json({ message: "Booking marked as rated successfully" });
+    } catch (error) {
+      console.error("Error updating booking:", error)
+      res.status(500).json({ error: "Internal server error" })
+    }
+  },
+  // handleConfirmRating: async (req, res) => {
+  //   const { bookingId, ratingValue } = req.body;
+
+  //   if (!bookingId || !ratingValue) {
+  //     return res.status(400).json({ message: "bookingId and ratingValue are required" });
+  //   }
+
+  //   try {
+  //     const booking = await db.Booking.findOne({
+  //       where: { id: bookingId },
+  //       include: [
+  //         {
+  //           model: db.User, 
+  //         },
+  //         {
+  //           model: db.Car, 
+  //           include: [
+  //             {
+  //               model: db.User, 
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     });
+
+  //     if (!booking) {
+  //       return res.status(404).json({ message: "Booking not found" })
+  //     }
+
+  //     await booking.update({ rating: ratingValue, rated: true });
+  //     const findOneCar = await db.Car.findOne({where:{ id: booking.CarId}})
+  //     const getRatesOfCar = await db.Booking.findAll({
+  //       where: {
+  //         CarId: booking.CarId,
+  //         rating: { [Op.not]: null }
+  //       },
+  //     });
+
+  //     const ratingsCount = await  getRatesOfCar.length;
+  //     const ratingsSum = await getRatesOfCar.reduce((sum, booking) => {
+  //       return sum + booking.rating;
+  //     }, 0);
+
+  //     const carRate = await ratingsSum/ratingsCount
+
+  //      await db.Car.update(
+  //       { Rating : carRate },
+  //       { where: { id: booking.CarId } }
+  //     )
+  //     const getRatesOfAgency = await db.Car.findAll({
+  //       where: {
+  //         UserId: findOneCar.UserId,
+  //         Rating: { [Op.not]: null }
+  //       },
+  //     });
+  //     const ratingsCountAgency = await  getRatesOfAgency.length;
+  //     const ratingsSumAgency = await getRatesOfAgency.reduce((sum, car) => {
+  //       return sum + car.Rating;
+  //     }, 0);
+      
+  //     agencyRate = await ratingsSumAgency/ratingsCountAgency
+
+  //     await db.User.update(
+  //       { Rating : agencyRate },
+  //       { where: { id: findOneCar.UserId } }
+  //     )
+  //     res.status(200).json({
+  //       message: "Booking rated successfully",
+  //      booking,
+  //      agencyRate,
+  //      carRate
+  //     });
+  //   } catch (error) {
+  //     console.error("Error confirming rating:", error);
+  //     res.status(500).json({ error: "Internal server error" });
+  //   }
+  // }
+  handleConfirmRating: async (req, res) => {
+    const { bookingId, ratingCar, ratingAgency } = req.body;
+  
+    if (!bookingId) {
+      return res.status(400).json({ message: "bookingId is required" });
+    }
+  
+    try {
+      const booking = await db.Booking.findOne({
+        where: { id: bookingId },
+        include: [
+          {
+            model: db.User,
+          },
+          {
+            model: db.Car,
+            include: [
+              {
+                model: db.User,
+              },
+            ],
+          },
+        ],
+      });
+  
+      if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+  
+      await booking.update({ rated: true });
+      const findOneCar = await db.Car.findOne({ where: { id: booking.CarId } });
+      await db.Review.create({
+        CarId: booking.CarId,
+        BookingId: booking.id,
+        UserId: findOneCar.UserId,
+        ratingCar,
+        ratingAgency,
+      });
+  
+      const getRatesOfCar = await db.Review.findAll({
+        where: {
+          CarId: booking.CarId,
+          ratingCar: { [Op.not]: null },
+        },
+      });
+  
+      const ratingsCount = await getRatesOfCar.length;
+      const ratingsSum = await getRatesOfCar.reduce((sum, car) => sum + car.ratingCar, 0);
+      const carRate = await ratingsCount > 0 ? ratingsSum / ratingsCount : 0;
+  
+      await db.Car.update(
+        { Rating: carRate },
+        { where: { id: booking.CarId } }
+      );
+  
+      const getRatesOfAgency = await db.Review.findAll({
+        where: {
+          UserId: findOneCar.UserId,
+          ratingAgency: { [Op.not]: null },
+        },
+      });
+  
+      const ratingsCountAgency = await getRatesOfAgency.length
+      const ratingsSumAgency = await getRatesOfAgency.reduce((sum, agency) => sum + agency.ratingAgency, 0)
+      const agencyRate = await ratingsCountAgency > 0 ? ratingsSumAgency / ratingsCountAgency : 0
+  
+      await db.User.update(
+        { Rating: agencyRate },
+        { where: { id: findOneCar.UserId } }
+      );
+  
+      res.status(200).json({
+        message: "Booking rated successfully",
+        booking,
+        agencyRate,
+        carRate,
+      });
+    } catch (error) {
+      console.error("Error confirming rating:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
 };

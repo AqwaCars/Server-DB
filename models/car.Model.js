@@ -42,6 +42,16 @@ module.exports = (DataTypes, connection) => {
     },
     Capacity: {
       type: DataTypes.INTEGER
+    },
+    Rating: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      defaultValue: null
+    },
+    numberOfCustomrs:{
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null
     }
   });
   return Car;
