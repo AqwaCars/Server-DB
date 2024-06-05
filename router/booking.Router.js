@@ -12,7 +12,11 @@ const {
   MarkDatesAsUnavailable,
   deletedServiceForUser,
   deletedServiceForagency,
-  calculateTotalPrice
+  calculateTotalPrice,
+  getFinishedBookings,
+  handleLater,
+  handleDontShowAgain,
+  handleConfirmRating
 } = require("../controller/booking.controller");
 const express = require("express");
 const bookingRouter = express.Router();
@@ -40,4 +44,8 @@ bookingRouter.get("/rentalHistory",getRentalHistory);
 bookingRouter.post("/avaibleCar", GetAvailableCars);
 bookingRouter.get("/allserviceforUser/:userId", GetAllServicesForUser);
 bookingRouter.post('/calculateTotalPrice', calculateTotalPrice);
+bookingRouter.post('/getFinishedBookings', getFinishedBookings);
+bookingRouter.post('/handleLater', handleLater);
+bookingRouter.put('/handleDontShowAgain', handleDontShowAgain);
+bookingRouter.post('/handleConfirmRating', handleConfirmRating);
 module.exports = bookingRouter;

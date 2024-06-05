@@ -92,6 +92,18 @@ module.exports = (DataTypes, connection) => {
         "https://as1.ftcdn.net/v2/jpg/04/60/01/36/1000_F_460013622_6xF8uN6ubMvLx0tAJECBHfKPoNOR5cRa.jpg",
       allowNull: true,
     },
+    cardIdFront: {
+      type: DataTypes.STRING,
+      defaultValue:
+        "https://as1.ftcdn.net/v2/jpg/04/60/01/36/1000_F_460013622_6xF8uN6ubMvLx0tAJECBHfKPoNOR5cRa.jpg",
+      allowNull: true,
+    },
+    cardIdBack: {
+      type: DataTypes.STRING,
+      defaultValue:
+        "https://as1.ftcdn.net/v2/jpg/04/60/01/36/1000_F_460013622_6xF8uN6ubMvLx0tAJECBHfKPoNOR5cRa.jpg",
+      allowNull: true,
+    },
     passport: {
       type: DataTypes.STRING,
       defaultValue:
@@ -116,6 +128,16 @@ module.exports = (DataTypes, connection) => {
       type: DataTypes.STRING,
       allowNull: true,
       },
+      Rating: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+        defaultValue: null
+      },
+      numberOfCustomrs:{
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null
+      }
   });
   User.beforeCreate((User, options) => {
     User.password = bcrypt.hashSync(User.password, saltRounds);

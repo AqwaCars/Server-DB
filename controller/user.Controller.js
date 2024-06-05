@@ -5,7 +5,7 @@ const Token = db.Token;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-const { Sequelize, Op } = require('sequelize');
+const { Sequelize, Op } = require("sequelize");
 
 // Controller methods for User
 module.exports = {
@@ -22,14 +22,16 @@ module.exports = {
       console.log("Type : ", req.params.DataType === "createdAt");
       const list = await db.User.findAll({
         order: [
-          req.params.DataType === "A-Z" ?
-            ['userName', 'ASC'] : req.params.DataType === "createdAt" ?
-              ['createdAt', 'ASC'] : req.params.DataType === "carsRented" ?
-                ["carsRented", 'ASC'] : null
-        ]
-      })
-      list ?
-        res.json(list) : res.json([])
+          req.params.DataType === "A-Z"
+            ? ["userName", "ASC"]
+            : req.params.DataType === "createdAt"
+            ? ["createdAt", "ASC"]
+            : req.params.DataType === "carsRented"
+            ? ["carsRented", "ASC"]
+            : null,
+        ],
+      });
+      list ? res.json(list) : res.json([]);
     } catch (error) {
       next(error);
     }
@@ -52,45 +54,7 @@ module.exports = {
       next(error);
     }
   },
-  // SignUpUser: async (req, res, next) => {
-  //   const NameCheck = await db.User.findAll({
-  //     where: {
-  //       userName: req.body.userName,
-  //     },
-  //   });
-  //   const emailCheck = await db.User.findAll({
-  //     where: {
-  //       email: req.body.email,
-  //     },
-  //   });
-  //   if (NameCheck[0] || emailCheck[0]) {
-  //     if (NameCheck[0]) {
-  //       return res.status(403).send({
-  //         status: "Blocked",
-  //         message: "This UserName Already Exists",
-  //         found: NameCheck,
-  //       });
-  //     }
-  //     if (emailCheck[0]) {
-  //       return res.status(403).send({
-  //         status: "Blocked",
-  //         message: "This Email Already Exists",
-  //         found: emailCheck,
-  //       });
-  //     }
-  //   } else {
-  //     const User = await db.User.create(req.body);
-  //     res.status(201).send({
-  //       status: "success",
-  //       message: "user added successfully!!!",
-  //       data: User,
-  //     });
-  //   }
-  //   try {
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // },
+
   SignUpCompany: async (req, res, next) => {
     try {
       const NameCheck = await db.User.findAll({
@@ -130,108 +94,8 @@ module.exports = {
       next(err);
     }
   },
-  // checks if a user exists using email
 
-  // SignUpUser: async (req, res, next) => {
-  //   try {
-  //   const emailCheck = await db.User.findAll({
-  //     where: {
-  //       email: req.body.email,
-  //     },
-  //   });
-  //   if (emailCheck[0]) {
-
-  //       return res.status(403).send({
-  //         status: "Blocked",
-  //         message: "This Email Already Exists",
-  //         found: emailCheck,
-  //       });
-
-  //   } else {
-  //     const User = await db.User.create(req.body);
-  //     res.status(201).send({
-  //       status: "success",
-  //       message: "user added successfully!!!",
-  //       data: User,
-  //     });
-  //   }
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // },
-  // original
-  // SignUpUser: async (req, res) => {
-  //   const {
-  //     userName,
-  //     phoneNumber,
-  //     password,
-  //     confirmPassword,
-  //     email,
-  //     dateOfBirth,
-  //     selfie,
-  //     drivingLicenseFront,
-  //     drivingLicenseBack,
-  //     passport,
-  //     cardIdBack,
-  //     cardIdFront
-  //   } = req.body;
-  //   if (
-  //     !userName ||
-  //     !phoneNumber ||
-  //     !password ||
-  //     !confirmPassword ||
-  //     !email ||
-  //     !dateOfBirth ||
-  //     !selfie ||
-  //     !drivingLicenseFront ||
-  //     !drivingLicenseBack ||
-  //     !cardIdFront ||
-  //     !cardIdBack ||
-  //     !passport
-  //   ) {
-  //     return res.status(422).json({ error: "fill all the details" });
-  //   }
-  //   try {
-  //     console.log("Before finding user");
-  //     const findUser = await User.findOne({ where: { email,isArchived:false } });
-  //     const findUserByPhone = await User.findOne({
-  //       where: { phoneNumber,isArchived:false },
-  //     });
-  //     if (findUser) {
-  //       return res.status(409).json({ error: "This email is already existed" });
-  //     } else if (findUserByPhone) {
-  //       return res
-  //         .status(409)
-  //         .json({ error: "This phone number is already existed" });
-  //     } else if (password !== confirmPassword) {
-  //       return res
-  //         .status(422)
-  //         .json({ error: "Password and confirm password are not match" });
-  //     } else {
-  //       const finalUser = await User.create({
-  //         userName,
-  //         phoneNumber,
-  //         password,
-  //         email,
-  //         dateOfBirth,
-  //         selfie,
-  //         drivingLicenseFront,
-  //         drivingLicenseBack,
-  //         cardIdFront,
-  //         cardIdBack,
-  //         passport
-  //       });
-  //       console.log(finalUser);
-  //       res.status(201).json(finalUser);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     return res
-  //       .status(500)
-  //       .json({ error: "Internal server error", details: error.message });
-  //   }
-  // },
-  SignUpUser : async (req, res) => {
+  SignUpUser: async (req, res) => {
     const {
       userName,
       phoneNumber,
@@ -246,7 +110,7 @@ module.exports = {
       cardIdBack,
       cardIdFront,
     } = req.body;
-  
+
     if (
       !userName ||
       !phoneNumber ||
@@ -262,17 +126,25 @@ module.exports = {
     ) {
       return res.status(422).json({ error: "fill all the details" });
     }
-  
+
     try {
-      const findUser = await User.findOne({ where: { email, isArchived: false } });
-      const findUserByPhone = await User.findOne({ where: { phoneNumber, isArchived: false } });
-  
+      const findUser = await User.findOne({
+        where: { email, isArchived: false },
+      });
+      const findUserByPhone = await User.findOne({
+        where: { phoneNumber, isArchived: false },
+      });
+
       if (findUser) {
         return res.status(409).json({ error: "This email is already existed" });
       } else if (findUserByPhone) {
-        return res.status(409).json({ error: "This phone number is already existed" });
+        return res
+          .status(409)
+          .json({ error: "This phone number is already existed" });
       } else if (password !== confirmPassword) {
-        return res.status(422).json({ error: "Password and confirm password are not match" });
+        return res
+          .status(422)
+          .json({ error: "Password and confirm password are not match" });
       } else {
         const finalUser = await User.create({
           userName,
@@ -285,34 +157,20 @@ module.exports = {
           drivingLicenseBack,
           cardIdFront,
           cardIdBack,
-          passport: passport || null, // Set passport to null if it's not provided
+          passport: passport || null, 
         });
-  
+
         res.status(201).json(finalUser);
       }
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Internal server error", details: error.message });
+      return res
+        .status(500)
+        .json({ error: "Internal server error", details: error.message });
     }
   },
-  
-  // emailLogin: async (req, res) => {
-  //   try {
-  //     const user = await User.findOne({ where: { email: req.body.email } });
-  //     if (!user) {
-  //       return res.status(404).json("user does not exist");
-  //     }
-  //     if (!(await bcrypt.compare(req.body.password, user.password))) {
-  //       return res.status(401).json("wrong password");
-  //     }
-  //     const token = jwt.sign(user.dataValues, process.env.JWT_SECRET_KEY);
-  //     res.send(token);
-  //   } catch (err) {
-  //     res.status(500).send(err);
-  //   }
-  // },
 
-  // checks if a user exists using phone number
+
   emailLogin: async (req, res) => {
     const { email, password } = req.body;
 
@@ -323,7 +181,9 @@ module.exports = {
     }
 
     try {
-      const userValid = await User.findOne({ where: { email,isArchived:false } });
+      const userValid = await User.findOne({
+        where: { email, isArchived: false },
+      });
 
       if (!userValid) {
         return res.status(404).json({ error: "User not found" });
@@ -344,24 +204,39 @@ module.exports = {
           error: "Account not verified. Please verify your email address",
         });
       }
+      if (isMatch && userValid.type !== "user") {
+        return res.status(403).json({
+          error: "User not found",
+        });
+      }
       if (!isMatch) {
         return res.status(422).json({ error: "Invalid email or password" });
       }
 
       // const token = jwt.sign(userValid.id, process.env.JWT_SECRET_KEY);
-      if (isMatch && userValid.isVerified && !userValid.isBlocked && !userValid.isArchived) {
-     
-        const token = await jwt.sign({ id: userValid.id }, process.env.JWT_SECRET_KEY);
-        
+      if (
+        isMatch &&
+        userValid.isVerified &&
+        !userValid.isBlocked &&
+        !userValid.isArchived
+      ) {
+        const token = await jwt.sign(
+          { id: userValid.id },
+          process.env.JWT_SECRET_KEY
+        );
+
         const result = {
-          id:userValid.id,
-          email:userValid.email,
+          id: userValid.id,
+          email: userValid.email,
           token,
         };
-        
-        const AddToken = await db.Token.create({token:token,UserId:userValid.id});
+
+        const AddToken = await db.Token.create({
+          token: token,
+          UserId: userValid.id,
+        });
         res.status(200).json({ status: 200, result });
-        };
+      }
     } catch (error) {
       console.error("Error during login:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -371,7 +246,7 @@ module.exports = {
     const { email, otpCode } = req.body;
 
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
+      const user = await User.findOne({ where: { email, isArchived: false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -398,33 +273,33 @@ module.exports = {
     }
   },
 
-  sendOTPVerification : async (req, res) => {
+  sendOTPVerification: async (req, res) => {
     const { email } = req.body;
     const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-        tls: {
-            rejectUnauthorized: false,
-        },
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
 
     try {
-        const user = await User.findOne({ where: { email, isArchived: false } });
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        
-        // Generate a 6-digit OTP code
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const user = await User.findOne({ where: { email, isArchived: false } });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
 
-        // Update the user with the new OTP code
-        await User.update({ verificationOTP: code }, { where: { email } });
+      // Generate a 6-digit OTP code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Define the HTML content of the email
-        const htmlContent = `
+      // Update the user with the new OTP code
+      await User.update({ verificationOTP: code }, { where: { email } });
+
+      // Define the HTML content of the email
+      const htmlContent = `
         <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2">
           <div style="margin: 50px auto; width: 70%; padding: 20px 0">
             <div style="border-bottom: 1px solid #eee">
@@ -444,27 +319,25 @@ module.exports = {
           </div>
         </div>
       `;
-      
-      
 
-        // Define the mail options
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Account Verification Code",
-            html: htmlContent,
-        };
+      // Define the mail options
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Account Verification Code",
+        html: htmlContent,
+      };
 
-        // Send the email
-        await transporter.sendMail(mailOptions);
+      // Send the email
+      await transporter.sendMail(mailOptions);
 
-        console.log("Email sent successfully");
-        return res.status(200).json({ message: "Email sent successfully" });
+      console.log("Email sent successfully");
+      return res.status(200).json({ message: "Email sent successfully" });
     } catch (error) {
-        console.error("Failed to send email:", error);
-        return res.status(500).json({ error: "Failed to send email" });
+      console.error("Failed to send email:", error);
+      return res.status(500).json({ error: "Failed to send email" });
     }
-},
+  },
   sendOTPForgetPassword: async (req, res) => {
     const { email } = req.body;
     const transporter = nodemailer.createTransport({
@@ -479,7 +352,7 @@ module.exports = {
     });
 
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
+      const user = await User.findOne({ where: { email, isArchived: false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -488,7 +361,6 @@ module.exports = {
         { forgetPasswordOTP: code },
         { where: { email } }
       );
-
 
       const htmlContent = `
       <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2">
@@ -511,8 +383,6 @@ module.exports = {
         </div>
       </div>
     `;
-    
-
 
       const mailOptions = {
         from: process.env.EMAIL_USER,
@@ -543,7 +413,7 @@ module.exports = {
     });
 
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
+      const user = await User.findOne({ where: { email, isArchived: false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -574,7 +444,7 @@ module.exports = {
   <![endif]-->
   <div style="margin:0px auto;max-width:600px;"><table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0px;width:100%;" align="center" border="0"><tbody><tr><td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:20px 0px;"><!--[if mso | IE]>
       <table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td style="vertical-align:top;width:600px;">
-      <![endif]--><div class="mj-column-per-100 outlook-group-fix" style="vertical-align:top;display:inline-block;direction:ltr;font-size:13px;text-align:left;width:100%;"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:0px;padding-right:0px;padding-left:0px;" align="center"><table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border-spacing:0px;" align="center" border="0"><tbody><tr><td style="width:600px;"><img alt="" title="" height="auto" src="https://app.kometsales.com/img/template/email-welcome/header.jpg" style="border:none;border-radius:;display:block;outline:none;text-decoration:none;width:100%;height:auto;" width="600"></td></tr></tbody></table></td></tr></tbody></table></div><!--[if mso | IE]>
+      <![endif]--><div class="mj-column-per-100 outlook-group-fix" style="vertical-align:top;display:inline-block;direction:ltr;font-size:13px;text-align:left;width:100%;"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:0px;padding-right:0px;padding-left:0px;" align="center"><table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border-spacing:0px;" align="center" border="0"><tbody><tr><td style="width:600px"><img alt="" title="" height="auto" src="https://res.cloudinary.com/dl9cp8cwq/image/upload/v1717509958/apk_images/Untitled_design_85_r5zzcs.png" style="border:none;border-radius:;display:block;outline:none;text-decoration:none;width:100%;height:auto;" width="600"></td></tr></tbody></table></td></tr></tbody></table></div><!--[if mso | IE]>
       </td></tr></table>
       <![endif]--></td></tr></tbody></table></div><!--[if mso | IE]>
   </td></tr></table>
@@ -586,17 +456,19 @@ module.exports = {
   <![endif]--><div style="margin:0px auto;max-width:600px;"><table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0px;width:100%;" align="center" border="0"><tbody><tr><td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:20px 0px;"><!--[if mso | IE]>
       <table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td style="vertical-align:top;width:600px;">
       <![endif]--><div class="mj-column-px-600 outlook-group-fix" style="vertical-align:top;display:inline-block;direction:ltr;font-size:13px;text-align:left;width:100%;"><table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="left"><div class="" style="cursor:auto;color:#117CA8;font-family:Helvetica;font-size:20px;font-weight:bold;line-height:22px;text-align:left;">Hi ${user.userName},</div></td></tr><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="left"><div class="" style="cursor:auto;color:#525252;font-family:Helvetica;font-size:16px;line-height:22px;text-align:left;">
-          Thank you for choosing Komet Sales as your technology business partner. Surely, everyone at <b>$company</b> will have the best user experience with our platform!
+         Thank you for choosing Aqwa Cars, Tunisia's leading and exclusive car rental service! We are delighted to welcome you and are committed to ensuring you have the best possible experience with our platform.
       </div></td></tr><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="left"><div class="" style="cursor:auto;color:#525252;font-family:Helvetica;font-size:16px;line-height:22px;text-align:left;">
-          To access your account please visit <a href="https://www.kometsales.com" style="color:#117CA8;">www.kometsales.com</a> and use these credentials:
+          To get started, please open our mobile application and log in with the following credentials:
+
+
       </div></td></tr><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="left"><div class="" style="cursor:auto;color:#525252;font-family:Helvetica;font-size:16px;line-height:22px;text-align:left;">
-          <b>Account #:</b> $accountNumber
+          <b>Account:</b> [AccountName]
           <br>
-          <b>Username:</b> $login
+          <b>Phone Number:</b> [PhoneNumber]
           <br>
-          <b>Password:</b> $password
+          <b>Email:</b> [Email]
       </div></td></tr><tr><td style="word-break:break-word;font-size:0px;padding:10px 25px;" align="left"><div class="" style="cursor:auto;color:#525252;font-family:Helvetica;font-size:16px;line-height:22px;text-align:left;">
-          One of our Implementation Specialists will contact you to start with the process soon.
+          At Aqwa Cars, we pride ourselves on offering a diverse selection of vehicles to suit all your travel needs. Whether you're looking for a compact car for efficient city driving or a spacious SUV for a family getaway, we have the perfect vehicle for every occasion.
       </div></td></tr>
       <![endif]--><tr><td style="word-break:break-word;font-size:0px;padding:10px 0px 10px 35px;" align="left"><div class="" style="cursor:auto;color:#000000;font-family:Helvetica;font-size:12px;line-height:22px;text-align:left;">
           <mj-raw>
@@ -629,14 +501,14 @@ module.exports = {
   </tbody></table>
 
                       
-                      <table id="SpacerTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#F2F2F2; width:100%!important;">
+                      <table id="SpacerTable" border="0" cellspacing="" cellpadding="0" bgcolor="#F2F2F2" width="50%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#FFFFFF; width:100%!important;">
                          <tbody><tr><td height="40" style="border-collapse: collapse;"></td></tr>
                       </tbody></table><!--SpacerTable-->
 
-                      <table id="SocialTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; width:100%!important;">
+                      <table id="SocialTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; width:100%!important;">
                          <tbody><tr>
                             <td align="center" valign="top" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;">
-                               <table id="FollowUsTable" border="0" cellspacing="0" cellpadding="0" width="100%" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">
+                           <table id="FollowUsTable" border="0" cellspacing="0" cellpadding="0" width="100%" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">
                                   <tbody><tr>
                                      <td width="60" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:1;font-weight:bold;color:#707070;text-align:center;"></td>
                                      <td align="center" valign="middle" style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:1;font-weight:bold;color:#707070;text-align:center;">
@@ -681,12 +553,7 @@ module.exports = {
                                            <img alt="Instagram" class="image_fix" height="37" width="36" border="0" src="https://s3.amazonaws.com/static.komoot.de/email/inspire/ic-social-instagram@2x.png" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;border:none;display:block;"></a>
                                      </td>
                                   
-                                     <!--<td width="30"></td>
-                                        <td width="36" align="center" valign="middle">
-                                        <a href="https://api.komoot.de/v007/mail/c?u=442528186864&t=welcome_mail_1&d=1259642336292563501&r=https%3A%2F%2Fplus.google.com%2F%2Bkomoot" target="_blank">
-                                        <img alt="Google+" class="image_fix" height="37" width="51" border="0" src="https://s3.amazonaws.com/static.komoot.de/email/inspire/ic-social-gplus@2x.png">
-                                        </a>
-                                        </td>-->
+                                  
                                         <td style="border-collapse:collapse;font-family:Helvetica, Arial, sans-serif;">&nbsp;</td>
                                   </tr>
                                </tbody></table>
@@ -694,17 +561,17 @@ module.exports = {
                          </tr>
                       </tbody></table>
 
-                      <table id="SpacerTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#F2F2F2; width:100%!important;">
+                      <table id="SpacerTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#FFFFFF; width:100%!important;">
                          <tbody><tr><td height="40" style="border-collapse: collapse;"></td></tr>
                       </tbody></table><!--SpacerTable-->
 
                       
-                         <table id="FooterTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#F2F2F2; width:100%!important;">
+                         <table id="FooterTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#FFFFFF; width:100%!important;">
                             <tbody><tr>
                                <td width="20" style="border-collapse: collapse;"></td>
                                <td align="center" style="border-collapse: collapse; font-family: Helvetica, Arial, sans-serif; font-size:12px; line-height:1.4; font-weight: normal; color: #999999; text-align: center;">
 
-                                  You’ve received this Welcome Email because you signed up for komoot. Tired of us already? You can <a target="_blank" style="color: #999999; text-decoration: underline;" href="#">unsubscribe</a> at any time. If you’d like to unsubscribe from all komoot communication, please change your <a target="_blank" style="color: #999999; text-decoration: underline;" href="#">settings</a>.
+                                  You’ve received this Welcome Email because you signed up for komoot. Tired of us already? You can unsubscribe at any time. If you’d like to unsubscribe from all komoot communication, please change your settings.
 
                                </td>
                                <td width="20" style="border-collapse: collapse;"></td>
@@ -714,8 +581,8 @@ module.exports = {
                                <td width="20" style="border-collapse: collapse;"></td>
                                <td align="center" style="border-collapse: collapse; font-family: Helvetica, Arial, sans-serif; font-size:12px; line-height:1.4; font-weight: normal; color: #999999; text-align: center;">
                                   <div class="vcard">
-                                     <span class="org fn">komoot GmbH</span> • <span class="adr"><span class="street-address">Friedrich-Wilhelm-Boelcke-Straße 2</span> • <span class="postal-code">14473</span> <span class="locality">Potsdam</span><br>
-                                        <a style="color: #999999; text-decoration: underline;" href="https://www.komoot.com?utm_source=welcome-mail&amp;utm_medium=email&amp;utm_content=footer-komoot&amp;utm_campaign=welcome-mails" target="_blank" class="url">www.komoot.de</a> • <a class="email" style="color: #999999; text-decoration: underline;" href="mailto:help@komoot.de" target="_blank">help@komoot.de</a></span>
+                                     <span class="org fn">aqwa Cars S.A.R.L</span> • <span class="adr"><span class="street-address">Friedrich-Wilhelm-Boelcke-Straße 2</span> • <span class="postal-code">14473</span> <span class="locality">Potsdam</span><br>
+                                        <a style="color: #999999; text-decoration: underline;" href="https://www.aqwa-cars.com" target="_blank" class="url">www.aqwa-cars.com</a> • <a class="email" style="color: #999999; text-decoration: underline;" href="mailto:help@komoot.de" target="_blank">help@aqwa-cars.com</a></span>
                                   </div>
                                </td>
                                <td width="20" style="border-collapse: collapse;"></td>
@@ -724,9 +591,7 @@ module.exports = {
                          </tbody></table><!--FooterTable-->
                       
 
-                      <table id="SpacerTable" border="0" cellspacing="0" cellpadding="0" bgcolor="#F2F2F2" width="100%" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#F2F2F2; width:100%!important;">
-                         <tbody><tr><td height="60" style="border-collapse: collapse;"></td></tr>
-                      </tbody></table><!--SpacerTable-->
+                     <!--SpacerTable-->
 
                    </td>
                 </tr>
@@ -755,7 +620,7 @@ module.exports = {
     const { email, otpCode } = req.body;
 
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
+      const user = await User.findOne({ where: { email, isArchived: false } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -763,13 +628,12 @@ module.exports = {
       if (user.forgetPasswordOTP !== otpCode) {
         return res.status(400).json({ error: "Incorrect OTP code" });
       }
-      if(user.forgetPasswordOTP === otpCode){
-
+      if (user.forgetPasswordOTP === otpCode) {
         const updateUser = await User.update(
           { forgetPasswordOTP: null },
           { where: { email } }
         );
-  
+
         return res
           .status(200)
           .json({ message: "OTP code verified successfully" });
@@ -993,42 +857,40 @@ module.exports = {
   },
   changePassword: async (req, res) => {
     const { email, newPassword, confirmPassword } = req.body;
-  
+
     try {
       if (!email || !newPassword || !confirmPassword) {
-        return res
-          .status(400)
-          .json({
-            error: "Please provide email, new password, and confirm password",
-          });
+        return res.status(400).json({
+          error: "Please provide email, new password, and confirm password",
+        });
       }
-  
+
       if (newPassword !== confirmPassword) {
         return res
           .status(422)
           .json({ error: "New password and confirm password do not match" });
       }
-  
-      const user = await User.findOne({ where: { email,isArchived:false } });
-  
+
+      const user = await User.findOne({ where: { email, isArchived: false } });
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const isMatch = await bcrypt.compare(newPassword, user.password);
-  
+
       if (isMatch) {
         return res
           .status(422)
           .json({ error: "Please choose a different password" });
       }
-  
+
       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
       const updateUser = await User.update(
         { password: hashedNewPassword },
         { where: { email } }
       );
-  
+
       res.status(200).json({ message: "Password changed successfully" });
     } catch (error) {
       console.error("Error changing password:", error);
@@ -1037,38 +899,34 @@ module.exports = {
   },
   verifyCurrentPass: async (req, res) => {
     const { email, newPassword, confirmPassword } = req.body;
-  
+
     try {
       if (!email || !newPassword || !confirmPassword) {
-        return res
-          .status(400)
-          .json({
-            error: "Please provide email, new password, and confirm password",
-          });
+        return res.status(400).json({
+          error: "Please provide email, new password, and confirm password",
+        });
       }
-  
+
       if (newPassword !== confirmPassword) {
         return res
           .status(422)
           .json({ error: "New password and confirm password do not match" });
       }
-  
-      const user = await User.findOne({ where: { email,isArchived:false } });
-  
+
+      const user = await User.findOne({ where: { email, isArchived: false } });
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const isMatch = await bcrypt.compare(newPassword, user.password);
-  
+
       if (isMatch) {
         return res
           .status(422)
           .json({ error: "Please choose a different password" });
       }
-        res.status(200).json({ message: "You can change your password" });
-      
-  
+      res.status(200).json({ message: "You can change your password" });
     } catch (error) {
       console.error("Error changing password:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -1076,22 +934,28 @@ module.exports = {
   },
   deconnection: async (req, res) => {
     const { token } = req.body;
-  
+
     try {
       const verifyToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
       // console.log(verifyToken.id,"This is token");
-  
-      const tokens = await Token.findAll({ where: { UserId: verifyToken.id, token: token } });
-  
+
+      const tokens = await Token.findAll({
+        where: { UserId: verifyToken.id, token: token },
+      });
+
       if (tokens.length > 0) {
-        await Token.destroy({ where: { UserId: verifyToken.id, token: token } });
-        res.status(200).json({ status: 200, message: 'Token successfully deleted' });
+        await Token.destroy({
+          where: { UserId: verifyToken.id, token: token },
+        });
+        res
+          .status(200)
+          .json({ status: 200, message: "Token successfully deleted" });
       } else {
-        res.status(404).json({ error: 'Token not found' });
+        res.status(404).json({ error: "Token not found" });
       }
     } catch (error) {
-      if (error.name === 'JsonWebTokenError') {
-        res.status(403).json({ error: 'Invalid token' });
+      if (error.name === "JsonWebTokenError") {
+        res.status(403).json({ error: "Invalid token" });
       } else {
         console.error("Error during deconnection:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -1099,182 +963,210 @@ module.exports = {
     }
   },
   validatorUser: async (req, res) => {
-    const { token } = req.body
+    const { token } = req.body;
     try {
       const verifyToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-      console.log(verifyToken.id,"This is token");
+      console.log(verifyToken.id, "This is token");
 
-      const tokens = await Token.findAll({ where: { UserId: verifyToken.id, token: token } });
+      const tokens = await Token.findAll({
+        where: { UserId: verifyToken.id, token: token },
+      });
       if (tokens.length > 0) {
-        res.status(200).json({ status: 200, message: 'Valid user' });
+        res.status(200).json({ status: 200, message: "Valid user" });
       } else {
-        res.status(404).json({ error: 'Token not found' });
+        res.status(404).json({ error: "Token not found" });
       }
     } catch (error) {
       res.status(500).json({ error: "Internal server error" });
     }
   },
-   deconnectionFromDevices : async (req, res) => {
+  deconnectionFromDevices: async (req, res) => {
     const { email } = req.body;
-  
+
     try {
-      const user = await User.findOne({ where: { email,isArchived:false } });
-      
+      const user = await User.findOne({ where: { email, isArchived: false } });
+
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
-  
+
       await Token.destroy({ where: { UserId: user.id } });
-  
-      res.status(200).json({ message: 'All tokens deleted successfully' });
+
+      res.status(200).json({ message: "All tokens deleted successfully" });
     } catch (error) {
-      console.error('Error during token deletion:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error("Error during token deletion:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   },
-  changePasswordCRM : async (req, res) => {
+  changePasswordCRM: async (req, res) => {
     const { id, currentPassword, newPassword, confirmPassword } = req.body;
-  
+
     try {
       if (!id || !currentPassword || !newPassword || !confirmPassword) {
         return res.status(400).json({
-          error: "Please provide id, current password, new password, and confirm password",
+          error:
+            "Please provide id, current password, new password, and confirm password",
         });
       }
-  
+
       if (newPassword !== confirmPassword) {
-        return res.status(422).json({ error: "New password and confirm password do not match" });
+        return res
+          .status(422)
+          .json({ error: "New password and confirm password do not match" });
       }
-  
+
       const user = await User.findOne({ where: { id, isArchived: false } });
-  
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const isMatch = await bcrypt.compare(currentPassword, user.password);
-  
+
       if (!isMatch) {
         return res.status(422).json({ error: "Current password is incorrect" });
       }
-  
+
       if (currentPassword === newPassword) {
-        return res.status(422).json({ error: "New password must be different from current password" });
+        return res
+          .status(422)
+          .json({
+            error: "New password must be different from current password",
+          });
       }
-  
+
       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
       const updateUser = await User.update(
         { password: hashedNewPassword },
         { where: { id } }
       );
-  
+
       res.status(200).json({ message: "Password changed successfully" });
     } catch (error) {
       console.error("Error changing password:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   },
-  changePasswordCRMVerif : async (req, res) => {
+  changePasswordCRMVerif: async (req, res) => {
     const { id, currentPassword, newPassword, confirmPassword } = req.body;
-  
+
     try {
       if (!id || !currentPassword || !newPassword || !confirmPassword) {
         return res.status(400).json({
-          error: "Please provide current password, new password, and confirm password",
+          error:
+            "Please provide current password, new password, and confirm password",
         });
       }
-  
+
       if (newPassword !== confirmPassword) {
-        return res.status(422).json({ error: "New password and confirm password do not match" });
+        return res
+          .status(422)
+          .json({ error: "New password and confirm password do not match" });
       }
-  
+
       const user = await User.findOne({ where: { id, isArchived: false } });
-  
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const isMatch = await bcrypt.compare(currentPassword, user.password);
-  
+
       if (!isMatch) {
         return res.status(422).json({ error: "Current password is incorrect" });
       }
-  
+
       if (currentPassword === newPassword) {
-        return res.status(422).json({ error: "New password must be different from current password" });
+        return res
+          .status(422)
+          .json({
+            error: "New password must be different from current password",
+          });
       }
-  
+
       res.status(200).json({ message: "Password changed successfully" });
     } catch (error) {
       console.error("Error changing password:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   },
-  IdDeconnectionFromDevices : async (req, res) => {
+  IdDeconnectionFromDevices: async (req, res) => {
     const { id, token } = req.body;
     try {
       await Token.destroy({
         where: {
           UserId: id,
-          token: { [Sequelize.Op.ne]: token } 
-        }
+          token: { [Sequelize.Op.ne]: token },
+        },
       });
-  
-      res.status(200).json({ message: 'All tokens except the specified one deleted successfully' });
+
+      res
+        .status(200)
+        .json({
+          message: "All tokens except the specified one deleted successfully",
+        });
     } catch (error) {
-      console.error('Error during token deletion:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error("Error during token deletion:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   },
-  updatePhoneNumber : async (req, res) => {
+  updatePhoneNumber: async (req, res) => {
     const { phoneNumber, id } = req.body;
   
     if (!phoneNumber || !id) {
-      return res.status(400).json({ message: 'User ID and phone number are required' });
+      return res.status(400).json({ message: "User ID and phone number are required" });
     }
   
     try {
-      const result = await User.update(
-        { phoneNumber },
-        { where: { id } }
-      );
+      // Check if the phone number already exists
+      const existingUser = await User.findOne({ where: { phoneNumber } });
+      if (existingUser && existingUser.id !== id) {
+        return res.status(409).json({ message: "Phone number already exists" });
+      }
   
-      const updated = result[0]
+      const result = await User.update({ phoneNumber }, { where: { id } });
+  
+      const updated = result[0];
   
       if (updated) {
-        res.status(200).json({ message: 'Phone number updated successfully' });
+        res.status(200).json({ message: "Phone number updated successfully" });
       } else {
-        res.status(404).json({ message: 'User not found' });
+        res.status(404).json({ message: "User not found" });
       }
     } catch (error) {
-      console.error('Error during phone number update:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error("Error during phone number update:", error);
+      if (error.code === 'ER_DUP_ENTRY') {
+        res.status(409).json({ message: "Phone number already exists" });
+      } else {
+        res.status(500).json({ message: "Internal server error" });
+      }
     }
   },
-   verifPassword : async (req, res) => {
+  
+  verifPassword: async (req, res) => {
     try {
       const { id, pass } = req.body;
-  
+
       if (!pass) {
         return res.status(400).json({
           error: "Please provide your password",
         });
       }
-  
+
       if (!id) {
         return res.status(400).json({
           error: "User id not found",
         });
       }
-  
+
       const user = await User.findOne({ where: { id, isArchived: false } });
-  
+
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-  
+
       const isMatch = await bcrypt.compare(pass, user.password);
-  
+
       if (isMatch) {
         return res.status(200).json({ message: "Password is correct" });
       } else {
@@ -1285,25 +1177,59 @@ module.exports = {
       return res.status(500).json({ error: "Internal server error" });
     }
   },
-  idDeconnectionFromAllDevices : async (req, res) => {
+  idDeconnectionFromAllDevices: async (req, res) => {
     const { id } = req.body;
+
+    try {
+      const user = await User.findOne({ where: { id } });
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      await Token.destroy({ where: { UserId: user.id } });
+
+      res.status(200).json({ message: "All tokens deleted successfully" });
+    } catch (error) {
+      console.error("Error during token deletion:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+  deleteAccount: async (req, res) => {
+    const { id } = req.body;
+  
+    if (!id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
   
     try {
       const user = await User.findOne({ where: { id } });
-      
+  
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
   
-      await Token.destroy({ where: { UserId: user.id } });
+      const [updated] = await User.update(
+        { isArchived: true },
+        { where: { id } }
+      );
   
-      res.status(200).json({ message: 'All tokens deleted successfully' });
+      if (!updated) {
+        return res.status(500).json({ message: "Failed to archive user" });
+      }
+  
+      const deletedTokens = await Token.destroy({ where: { UserId: id } });
+  
+      if (deletedTokens === 0) {
+        return res.status(200).json({ message: "User archived, but no tokens were found to delete" })
+      }
+  
+      res.status(200).json({ message: "User archived and tokens deleted successfully" });
+  
     } catch (error) {
-      console.error('Error during token deletion:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error("Error during user deletion:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-  },
-
+  }
   
-
 };

@@ -61,14 +61,20 @@ module.exports = (DataTypes, connection) => {
       type: DataTypes.STRING,
       allowNull:true
     },
-    UserId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    rated:{
+      type: DataTypes.BOOLEAN,
+      defaultValue:false
     },
-    CarId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    rating:{
+      type: DataTypes.FLOAT,
+      allowNull:true,
+      defaultValue:null
     },
+    ratingTry:{
+      type: DataTypes.INTEGER,
+      allowNull:true,
+      defaultValue:0
+    }
   });
   return Booking;
 };

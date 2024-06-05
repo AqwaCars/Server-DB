@@ -59,8 +59,8 @@ db.User.belongsTo(db.Booking);
 db.Request.hasOne(db.Agency);
 db.Agency.belongsTo(db.Request);
 
-db.Agency.hasMany(db.Car);
-db.Car.belongsTo(db.Agency);
+db.User.hasMany(db.Car);
+db.Car.belongsTo(db.User);
 
 db.Car.hasMany(db.Media);
 db.Media.belongsTo(db.Car);
@@ -70,6 +70,9 @@ db.Notifcation.belongsTo(db.User);
 
 db.Admin.hasMany(db.Car);
 db.Car.belongsTo(db.Admin);
+
+db.Booking.hasMany(db.Review);
+db.Review.belongsTo(db.Booking);
 
 db.User.hasMany(db.Review);
 db.Review.belongsTo(db.User);
