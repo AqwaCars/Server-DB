@@ -33,7 +33,8 @@ const {
   IdDeconnectionFromDevices,
   updatePhoneNumber,
   verifPassword,
-  idDeconnectionFromAllDevices
+  idDeconnectionFromAllDevices,
+  deleteAccount
 } = require("../controller/user.Controller");
 const { verify } = require("crypto");
 
@@ -76,5 +77,6 @@ router.post("/IdDeconnectionFromDevices", IdDeconnectionFromDevices)
 router.put("/updatePhoneNumber", updatePhoneNumber)
 router.post("/verifPassword", verifPassword)
 router.post("/idDeconnectionFromAllDevices", idDeconnectionFromAllDevices)
+router.post("/deleteAccount", deleteAccount)
 
 module.exports = router;

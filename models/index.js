@@ -76,6 +76,9 @@ db.Notifcation.belongsTo(db.User);
 db.Admin.hasMany(db.Car);
 db.Car.belongsTo(db.Admin);
 
+db.Booking.hasMany(db.Review);
+db.Review.belongsTo(db.Booking);
+
 db.User.hasMany(db.Review);
 db.Review.belongsTo(db.User);
 
