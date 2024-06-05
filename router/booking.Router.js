@@ -13,7 +13,9 @@ const {
   deletedServiceForUser,
   deletedServiceForagency,
   calculateTotalPrice,
-  getAllBookingsByUserId
+  getAllBookingsByUserId,
+  CreateBookingAdmin,
+  getAllBooking
 } = require("../controller/booking.controller");
 
 
@@ -21,6 +23,8 @@ const express = require("express");
 const bookingRouter = express.Router();
 
 bookingRouter.post("/createbooking", CreateBooking);
+bookingRouter.post("/CreateBookingAdmin", CreateBookingAdmin);
+
 bookingRouter.get("/unavailabledates/:oneCar", GetUnavailableDatesForCar);
 bookingRouter.delete(
   "/deletedServiceByAgency/:CarId/:id",
@@ -41,5 +45,6 @@ bookingRouter.post("/avaibleCar", GetAvailableCars);
 bookingRouter.get("/allserviceforUser/:userId", GetAllServicesForUser);
 bookingRouter.post('/calculateTotalPrice', calculateTotalPrice);
 bookingRouter.get('/getAllByUserId/:UserId', getAllBookingsByUserId);
+bookingRouter.get('/getAllBooking', getAllBooking);
 
 module.exports = bookingRouter;

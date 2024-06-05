@@ -19,7 +19,7 @@ module.exports = {
         // ],
         order: [['createdAt', 'DESC']] // Add this line to sort by createdAt in descending order
       });
-      console.log("jihed this is server :", allCars);
+      // console.log("jihed this is server :", allCars);
       res.status(200).send(allCars);
     } catch (error) {
       res.send(400).json(JSON.stringify(error));
@@ -30,10 +30,19 @@ module.exports = {
 
   CreateCar: async function (req, res, next) {
     try {
-      const newCar = await db.Car.create(
-        req.body
-      );
-      res.status(200).send(newCar);
+      if (req.params.carCount) {
+        // Transform req.body into an array of objects suitable for bulkCreate
+        const newCarsData = Array.from({ length: parseInt(req.params.carCount) }, () => req.body);
+      
+        // Now, newCarsData is an array of objects, each identical to req.body,
+        // and can be passed to bulkCreate
+        const newCars = await db.Car.bulkCreate(newCarsData);
+        res.status(200).send(newCars);
+      } else {
+        const newCar = await db.Car.create(req.body);
+        res.status(200).send(newCar);
+      }
+      
     } catch (error) {
       next(error);
     }
@@ -153,7 +162,7 @@ module.exports = {
   },
   updateCar: async function (req, res) {
     try {
-      console.log("UPDATING CAR PROCESS ? DATA IS : " , req.body);
+      console.log("UPDATING CAR PROCESS ? DATA IS : ", req.body);
       if (!req.params.id) {
         res.send(404).send({ "message": "id not found" })
       }
@@ -161,7 +170,7 @@ module.exports = {
       const updatedCar = await db.Car.update(req.body, {
         where: { id: carId }
       });
-      
+
 
       res.status(200).send(updatedCar);
     } catch (error) {

@@ -15,7 +15,7 @@ const carRouter = express.Router();
 carRouter.put("/updateCar/:id", updateCar);
 carRouter.get("/allCars", getAllCars);
 carRouter.post("/byBrand", filterCarByBrand);
-carRouter.post("/newCar", CreateCar);
+carRouter.post("/newCar/:carCount", CreateCar);
 carRouter.post("/imageCar/:id", createImage);
 carRouter.get("/searchName/:model", searchCarByModel);
 carRouter.post("/filtredCar", filtredCar);
