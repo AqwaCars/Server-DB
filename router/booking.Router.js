@@ -19,7 +19,8 @@ const {
   handleConfirmRating,
   getAllBookingsByUserId,
   CreateBookingAdmin,
-  getAllBooking
+  getAllBooking,
+  findCarAndAgency
 } = require("../controller/booking.controller");
 
 
@@ -54,5 +55,6 @@ bookingRouter.put('/handleDontShowAgain', handleDontShowAgain);
 bookingRouter.post('/handleConfirmRating', handleConfirmRating);
 bookingRouter.get('/getAllByUserId/:UserId', getAllBookingsByUserId);
 bookingRouter.get('/getAllBooking', getAllBooking);
+bookingRouter.get('/findCarAndAgency', findCarAndAgency);
 
 module.exports = bookingRouter;

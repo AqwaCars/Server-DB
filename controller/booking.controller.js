@@ -100,7 +100,10 @@ module.exports = {
       }
 
       // Get dates in range
-      const datesInRange = getDatesInRange(req.body.startDate, req.body.endDate);
+      const datesInRange = getDatesInRange(
+        req.body.startDate,
+        req.body.endDate
+      );
 
       // Create the booking
       const booking = await db.Booking.create({
@@ -123,12 +126,12 @@ module.exports = {
       });
 
       // Create booked periods
-      const bookedPeriods = datesInRange.map(date => ({
+      const bookedPeriods = datesInRange.map((date) => ({
         CarId,
         UserId,
         BookedPeriods: date,
         rentalTime,
-        returnTime
+        returnTime,
       }));
       // console.log("HEY MF HAKIM3", bookedPeriods,"dates are :", datesInRange);
       await db.BookedPeriods.bulkCreate(bookedPeriods);
@@ -137,9 +140,11 @@ module.exports = {
     } catch (error) {
       console.error("Error occurred while creating the booking:", error);
 
-      if (error.name === 'SequelizeValidationError') {
-        const validationErrors = error.errors.map(e => e.message);
-        return res.status(400).json({ message: "Validation error", errors: validationErrors });
+      if (error.name === "SequelizeValidationError") {
+        const validationErrors = error.errors.map((e) => e.message);
+        return res
+          .status(400)
+          .json({ message: "Validation error", errors: validationErrors });
       }
 
       return res.status(500).json(JSON.stringify(error));
@@ -170,7 +175,7 @@ module.exports = {
           startDate: { [Op.lt]: endDate },
           endDate: { [Op.gt]: startDate },
           // time: req.body.time ? req.body.time : null,
-        }
+        },
       });
       console.log("zok omek", conflictingRental);
       if (conflictingRental) {
@@ -199,16 +204,18 @@ module.exports = {
     } catch (error) {
       console.error("Error occurred while creating the booking:", error);
 
-      if (error.name === 'SequelizeValidationError') {
-        const validationErrors = error.errors.map(e => e.message);
-        return res.status(400).json({ message: "Validation error", errors: validationErrors });
+      if (error.name === "SequelizeValidationError") {
+        const validationErrors = error.errors.map((e) => e.message);
+        return res
+          .status(400)
+          .json({ message: "Validation error", errors: validationErrors });
       }
 
       return res.status(500).json(JSON.stringify(error));
     }
   },
 
-  getAllBooking: async (req,res,next) => {
+  getAllBooking: async (req, res, next) => {
     try {
       const response = await db.Booking.findAll({
         // where: { acceptation: "pending" },
@@ -216,7 +223,7 @@ module.exports = {
       });
       res.status(200).send(response);
     } catch (err) {
-      next(err)
+      next(err);
     }
   },
   getAllBookingsByUserId: async (req, res) => {
@@ -235,23 +242,31 @@ module.exports = {
         include: [
           {
             model: db.Car,
-            as: 'Car'
-          }
+            as: "Car",
+          },
         ],
       });
 
       if (!bookings || bookings.length === 0) {
-        return res.status(404).json({ message: "No bookings found for the given user." });
+        return res
+          .status(404)
+          .json({ message: "No bookings found for the given user." });
       }
 
       return res.json(bookings);
     } catch (error) {
-      console.error("Error occurred while fetching bookings:", JSON.stringify(error));
-      return res.status(500).json({ message: "An error occurred while fetching the bookings.", error: error });
+      console.error(
+        "Error occurred while fetching bookings:",
+        JSON.stringify(error)
+      );
+      return res
+        .status(500)
+        .json({
+          message: "An error occurred while fetching the bookings.",
+          error: error,
+        });
     }
   },
-
-
 
   GetAvailableDatesForCar: async function (req, res) {
     try {
@@ -322,14 +337,14 @@ module.exports = {
       //   const startDate = service.startDate;
       //   const endDate = service.endDate;
 
-        // const datesInRange = getDatesInRange(startDate, endDate);
+      // const datesInRange = getDatesInRange(startDate, endDate);
 
-        // await db.Availability.destroy({
-        //   where: {
-        //     CarId: service.CarId,
-        //     date: datesInRange,
-        //   },
-        // });
+      // await db.Availability.destroy({
+      //   where: {
+      //     CarId: service.CarId,
+      //     date: datesInRange,
+      //   },
+      // });
       // }
 
       await service.update({ acceptation });
@@ -551,9 +566,7 @@ module.exports = {
           rated: false,
           ratingTry: { [Op.lt]: 3 },
         },
-        include:[
-          {model:db.Car,include:[{model:db.User}]}
-        ]
+        include: [{ model: db.Car, include: [{ model: db.User }] }],
       });
 
       res.status(200).json(finishedBookings);
@@ -595,7 +608,7 @@ module.exports = {
       const updateResult = await db.Booking.update(
         { rated: true },
         { where: { id: bookingId } }
-      )
+      );
 
       if (updateResult[0] === 0) {
         return res.status(404).json({ message: "Booking not found" });
@@ -603,8 +616,8 @@ module.exports = {
 
       res.status(200).json({ message: "Booking marked as rated successfully" });
     } catch (error) {
-      console.error("Error updating booking:", error)
-      res.status(500).json({ error: "Internal server error" })
+      console.error("Error updating booking:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   },
   // handleConfirmRating: async (req, res) => {
@@ -619,13 +632,13 @@ module.exports = {
   //       where: { id: bookingId },
   //       include: [
   //         {
-  //           model: db.User, 
+  //           model: db.User,
   //         },
   //         {
-  //           model: db.Car, 
+  //           model: db.Car,
   //           include: [
   //             {
-  //               model: db.User, 
+  //               model: db.User,
   //             },
   //           ],
   //         },
@@ -666,7 +679,7 @@ module.exports = {
   //     const ratingsSumAgency = await getRatesOfAgency.reduce((sum, car) => {
   //       return sum + car.Rating;
   //     }, 0);
-      
+
   //     agencyRate = await ratingsSumAgency/ratingsCountAgency
 
   //     await db.User.update(
@@ -686,11 +699,11 @@ module.exports = {
   // }
   handleConfirmRating: async (req, res) => {
     const { bookingId, ratingCar, ratingAgency } = req.body;
-  
+
     if (!bookingId) {
       return res.status(400).json({ message: "bookingId is required" });
     }
-  
+
     try {
       const booking = await db.Booking.findOne({
         where: { id: bookingId },
@@ -708,11 +721,11 @@ module.exports = {
           },
         ],
       });
-  
+
       if (!booking) {
         return res.status(404).json({ message: "Booking not found" });
       }
-  
+
       await booking.update({ rated: true });
       const findOneCar = await db.Car.findOne({ where: { id: booking.CarId } });
       await db.Review.create({
@@ -722,39 +735,48 @@ module.exports = {
         ratingCar,
         ratingAgency,
       });
-  
+
       const getRatesOfCar = await db.Review.findAll({
         where: {
           CarId: booking.CarId,
           ratingCar: { [Op.not]: null },
         },
       });
-  
+
       const ratingsCount = await getRatesOfCar.length;
-      const ratingsSum = await getRatesOfCar.reduce((sum, car) => sum + car.ratingCar, 0);
-      const carRate = await ratingsCount > 0 ? ratingsSum / ratingsCount : 0;
-  
+      const ratingsSum = await getRatesOfCar.reduce(
+        (sum, car) => sum + car.ratingCar,
+        0
+      );
+      const carRate = (await ratingsCount) > 0 ? ratingsSum / ratingsCount : 0;
+
       await db.Car.update(
         { Rating: carRate },
         { where: { id: booking.CarId } }
       );
-  
+
       const getRatesOfAgency = await db.Review.findAll({
         where: {
           UserId: findOneCar.UserId,
           ratingAgency: { [Op.not]: null },
         },
       });
-  
-      const ratingsCountAgency = await getRatesOfAgency.length
-      const ratingsSumAgency = await getRatesOfAgency.reduce((sum, agency) => sum + agency.ratingAgency, 0)
-      const agencyRate = await ratingsCountAgency > 0 ? ratingsSumAgency / ratingsCountAgency : 0
-  
+
+      const ratingsCountAgency = await getRatesOfAgency.length;
+      const ratingsSumAgency = await getRatesOfAgency.reduce(
+        (sum, agency) => sum + agency.ratingAgency,
+        0
+      );
+      const agencyRate =
+        (await ratingsCountAgency) > 0
+          ? ratingsSumAgency / ratingsCountAgency
+          : 0;
+
       await db.User.update(
         { Rating: agencyRate },
         { where: { id: findOneCar.UserId } }
       );
-  
+
       res.status(200).json({
         message: "Booking rated successfully",
         booking,
@@ -765,5 +787,33 @@ module.exports = {
       console.error("Error confirming rating:", error);
       res.status(500).json({ error: "Internal server error" });
     }
+  },
+  findCarAndAgency: async (req, res) => {
+    const { idCar } = req.body;
+  
+    if (!idCar) {
+      return res.status(400).send({ error: "idCar is required" });
+    }
+  
+    try {
+      const car = await db.Car.findOne({
+        where: { id: idCar },
+        include: [
+          {
+            model: db.User,
+          },
+        ],
+      });
+  
+      if (!car) {
+        return res.status(404).send({ error: "Car not found" });
+      }
+  
+      res.status(200).send(car);
+    } catch (error) {
+      console.error("Error fetching car and agency: ", error);
+      res.status(500).send({ error: "An error occurred while fetching car and agency details" });
+    }
   }
+  
 };
