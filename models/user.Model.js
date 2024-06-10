@@ -1,7 +1,7 @@
 module.exports = (DataTypes, connection) => {
   const validator = require("validator");
   const bcrypt = require("bcrypt");
-  const saltRounds = bcrypt.genSaltSync(10);  
+  const saltRounds = bcrypt.genSaltSync(10);
   const User = connection.define("User", {
     userName: {
       type: DataTypes.STRING,
@@ -34,7 +34,7 @@ module.exports = (DataTypes, connection) => {
       //     "Password must contain at least one special character, one lowercase letter, one uppercase letter, one number, and be at least 8 characters long",
       // },
       allowNull: true,
-      defaultValue:"1234"
+      defaultValue: "Azerty1234!"
     },
     email: {
       type: DataTypes.STRING,
@@ -45,15 +45,19 @@ module.exports = (DataTypes, connection) => {
       //   message: "Email is not valid",
       // },
     },
-    type:{
-      type:DataTypes.ENUM("user","company"),
+    type: {
+      type: DataTypes.ENUM("user", "company"),
       allowNull: true,
       defaultValue: "user",
     },
     RNE: {
       type: DataTypes.STRING,
       allowNull: true,
-      defaultValue:"",
+      defaultValue: "",
+    },
+    notifToken: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     dateOfBirth: {
       type: DataTypes.STRING,
@@ -61,17 +65,17 @@ module.exports = (DataTypes, connection) => {
     },
     isVerified: {
       type: DataTypes.BOOLEAN,
-      defaultValue:false,
+      defaultValue: false,
       allowNull: true
     },
     isArchived: {
       type: DataTypes.BOOLEAN,
-      defaultValue:false,
+      defaultValue: false,
       allowNull: true
     },
     isBlocked: {
       type: DataTypes.BOOLEAN,
-      defaultValue:false,
+      defaultValue: false,
       allowNull: true
     },
     selfie: {
@@ -123,21 +127,21 @@ module.exports = (DataTypes, connection) => {
     verificationOTP: {
       type: DataTypes.STRING,
       allowNull: true,
-      },
+    },
     forgetPasswordOTP: {
       type: DataTypes.STRING,
       allowNull: true,
-      },
-      Rating: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-        defaultValue: null
-      },
-      numberOfCustomrs:{
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        defaultValue: null
-      }
+    },
+    Rating: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      defaultValue: null
+    },
+    numberOfCustomrs: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null
+    }
   });
   User.beforeCreate((User, options) => {
     User.password = bcrypt.hashSync(User.password, saltRounds);

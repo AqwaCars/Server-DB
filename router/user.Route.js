@@ -34,11 +34,13 @@ const {
   updatePhoneNumber,
   verifPassword,
   idDeconnectionFromAllDevices,
-  deleteAccount
+  deleteAccount,
+  update
 } = require("../controller/user.Controller");
 const { verify } = require("crypto");
 
 // Define routes for user operations
+router.patch("/updateUser/:id", update);
 router.get("/sort/:DataType", bringSortedData);
 router.get("/invSort/:DataType", bringInvertedSortedData);
 router.get("/getById/:id", getUserById);

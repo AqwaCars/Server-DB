@@ -162,7 +162,7 @@ module.exports = {
   },
   updateCar: async function (req, res) {
     try {
-      console.log("UPDATING CAR PROCESS ? DATA IS : ", req.body);
+      // console.log("UPDATING CAR PROCESS ? DATA IS : ", req.body);
       if (!req.params.id) {
         res.send(404).send({ "message": "id not found" })
       }

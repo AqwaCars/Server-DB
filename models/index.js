@@ -47,7 +47,7 @@ db.User.hasOne(db.Request);
 db.Request.belongsTo(db.User);
 
 db.BookedPeriods.hasOne(db.Car)
-db.Car.belongsTo(db.BookedPeriods)
+// db.Car.belongsTo(db.BookedPeriods)
 
 // db.User.hasMany(db.BookedPeriods)
 // db.BookedPeriods.belongsTo(db.User)
@@ -112,8 +112,8 @@ db.Message.belongsTo(db.RoomChat);
 db.User.hasMany(db.History);
 db.History.belongsTo(db.User);
 
-db.Car.hasMany(db.History);
-db.History.belongsTo(db.Car);
+// db.Car.hasMany(db.History);
+// db.History.belongsTo(db.Car);
 
 db.User.hasMany(db.BookMark);
 db.BookMark.belongsTo(db.User);
