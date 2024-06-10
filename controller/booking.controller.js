@@ -218,7 +218,8 @@ module.exports = {
   getAllBooking: async (req, res, next) => {
     try {
       const response = await db.Booking.findAll({
-        where: { acceptation: "pending" },
+        // where: { acceptation: "pending" },
+        order: [['createdAt', 'DESC']]
       });
       res.status(200).send(response);
     } catch (err) {
