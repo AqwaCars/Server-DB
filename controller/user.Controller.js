@@ -206,7 +206,7 @@ module.exports = {
       }
       if (isMatch && userValid.type !== "user") {
         return res.status(403).json({
-          error: "User not found",
+          error: "Can not login agency",
         });
       }
       if (!isMatch) {
