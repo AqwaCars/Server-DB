@@ -16,7 +16,8 @@ const {
   getLimitedCars,
   getLimitedCompanies,
   getAgencyCars,
-  getAgencyReviews
+  getAgencyReviews,
+  updateData
 } = require("../controller/Admin.controller");
 const express = require("express");
 const router = express.Router();
@@ -32,5 +33,6 @@ router.get("/getLimitedCompanies", getLimitedCompanies);
 router.get("/getAllCars", getAllCars);
 router.get("/getLimitedCars", getLimitedCars);
 router.put("/update/:id", updateOneUserblockState);
+router.put("/updateData/:id", updateData);
 
 module.exports = router;

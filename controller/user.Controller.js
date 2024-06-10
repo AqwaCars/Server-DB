@@ -1230,6 +1230,44 @@ module.exports = {
       console.error("Error during user deletion:", error);
       res.status(500).json({ message: "Internal server error" });
     }
-  }
-  
+  },
+  update: async (req, res) => {
+    try {
+       console.log(req.body);
+       let id = req.params.id;
+   
+       // Find the user by ID
+       const userData = await User.findOne({
+         where: {
+           id: id
+         }
+       });
+   
+       // Check if the user exists
+       if (!userData) {
+         return res.status(404).send("The User with The Id Provided Does Not Exist");
+       }
+   
+       // Dynamically construct the update object based on the properties present in req.body
+       const updateFields = Object.keys(req.body).reduce((acc, key) => {
+         acc[key] = req.body[key];
+         return acc;
+       }, {});
+   
+       console.log("Update fields:", updateFields); // Debugging line
+   
+       // Update the user
+       const updatedUser = await User.update(
+         updateFields,
+         {
+           where: { id: id },
+         }
+       );
+   
+       res.status(200).send(updatedUser);
+    } catch (error) {
+       console.error("Error updating user:", error);
+       res.status(500).send({ message: "An error occurred while updating the user." });
+    }
+   },
 };

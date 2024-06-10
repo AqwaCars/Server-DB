@@ -2,6 +2,7 @@ const { db } = require("../models/index");
 const Admin = db.Admin;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { where } = require("sequelize");
 require("dotenv").config();
 // Controller methods for Admin
 module.exports = {
@@ -39,18 +40,32 @@ module.exports = {
         include: [
           {
             model: db.Booking,
+            as:"Booking",
+              include: [
+                {
+                  model: db.User,
+                  as:"User",
+                  
+                },
+                {
+                  model:db.Car,
+                  as:"Car"
+                }
+              ],
+            
           },
           {
-            include: [
-              {
-                model: db.User,
-              },
-            ],
-          },
+            model:db.User,
+            as:"User"
+          }
         ],
-        order: [['createdAt', 'DESC']] // Add this line to sort by createdAt in descending order
-
+        // include:[{
+        //   model:db.User,
+        //     as:"User"
+        // }],
+        order: [['createdAt', 'DESC']] // This line sorts the results by createdAt in descending order
       });
+
       if (data) {
         res.json(data);
       }
@@ -291,4 +306,17 @@ module.exports = {
       next(error);
     }
   },
+  updateData:async(req,res,next)=>{
+    try {
+      const user = await db.User.findOne({ where: { id: req.params.id } });
+      if (user) {
+        const oneUser = await db.User.update(req.body,{where:{
+          id:user.id
+        }})
+        res.status(200).send(oneUser)
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
 };
