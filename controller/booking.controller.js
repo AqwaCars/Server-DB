@@ -403,8 +403,7 @@ module.exports = {
 
   GetAvailableCars: async function (req, res) {
     try {
-      const { startDate, endDate, price, typeOfFuel, Category, Type } =
-        req.body;
+      const { startDate, endDate, price, typeOfFuel, Category, Type, location } = req.body;
 
       const unavailableDates = await db.BookedPeriods.findAll({
         where: {
@@ -439,6 +438,10 @@ module.exports = {
         whereClause.Type = Type;
       }
 
+      if (location) {
+        whereClause.location = location;
+      }
+
       const availableCars = await db.Car.findAll({
         where: whereClause,
         // include: [
@@ -453,6 +456,8 @@ module.exports = {
       res.status(500).json({ message: "Internal server error" });
     }
   },
+
+
 
   GetAllServicesForUser: async function (req, res) {
     try {
@@ -790,11 +795,11 @@ module.exports = {
   },
   findCarAndAgency: async (req, res) => {
     const { idCar } = req.body;
-  
+
     if (!idCar) {
       return res.status(400).send({ error: "idCar is required" });
     }
-  
+
     try {
       const car = await db.Car.findOne({
         where: { id: idCar },
@@ -804,16 +809,16 @@ module.exports = {
           },
         ],
       });
-  
+
       if (!car) {
         return res.status(404).send({ error: "Car not found" });
       }
-  
+
       res.status(200).send(car);
     } catch (error) {
       console.error("Error fetching car and agency: ", error);
       res.status(500).send({ error: "An error occurred while fetching car and agency details" });
     }
   }
-  
+
 };

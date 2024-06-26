@@ -52,6 +52,9 @@ module.exports = (DataTypes, connection) => {
       type: DataTypes.INTEGER,
       allowNull: true,
       defaultValue: null
+    },
+    location : {
+      type: DataTypes.STRING,
     }
   });
   return Car;

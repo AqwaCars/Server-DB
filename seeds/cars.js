@@ -18,6 +18,7 @@ const cars = [
     typevehicle: "Economical",
     characteristics: "Automatic",
     AgencyId: 2,
+    location: "Mahdia",
   },
   {
     model: "Passat",
@@ -34,6 +35,8 @@ const cars = [
     typevehicle: "Luxury",
     characteristics: "Automatic",
     agencyId: 1,
+    location: "Tunisia",
+
   },
   {
     model: "Clio",
@@ -50,6 +53,8 @@ const cars = [
     typevehicle: "Economical",
     characteristics: "Manual",
     agencyId: 1,
+    location: "Sousse",
+
   },
   {
     model: "Laguna",
@@ -67,6 +72,8 @@ const cars = [
     typevehicle: "Luxury",
     characteristics: "Automatic",
     agencyId: 1,
+    location: "Kairouan",
+
   },
   {
     model: "Fiesta",
@@ -83,6 +90,8 @@ const cars = [
     typevehicle: "Economical",
     characteristics: "Manual",
     agencyId: 1,
+    location: "Mahdia",
+
   },
   {
     model: "Focus",
@@ -101,6 +110,8 @@ const cars = [
     typevehicle: "Sports",
     characteristics: "Automatic",
     agencyId: 1,
+    location: "Mahdia",
+
   },
   {
     model: "T-Roc",
@@ -117,6 +128,8 @@ const cars = [
     typevehicle: "Luxury",
     characteristics: "Automatic",
     agencyId: 1,
+    location: "Mahdia",
+
   }
  
 ];

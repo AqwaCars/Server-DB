@@ -1,8 +1,11 @@
 const { Sequelize, DataTypes } = require("sequelize");
-
-const connection = new Sequelize("rent", "root", "root", {
-  host: "localhost",
+require('dotenv').config(); 
+const DATABASEHOST = process.env.DATABASEHOSTPROD;
+const connection = new Sequelize("rent", "aqwa", "Aqwacars123456!", {
+  host: DATABASEHOST,
+  port: 3306,
   dialect: "mysql",
+
 });
 connection
   .authenticate()
@@ -13,12 +16,11 @@ connection
     console.error("error connecting to database", err);
   });
 
-// connection.sync({ alter: true });
-// connection.sync({ force: true });
 
 
+const db = {
 
-const db = {};
+};
 db.connection = connection;
 db.Sequelize = Sequelize;
 db.BookedPeriods = require("./BookedPeriods.Model")(DataTypes, connection);
@@ -123,5 +125,17 @@ db.BookMark.belongsTo(db.User);
 
 db.User.hasMany(db.Token);
 db.Token.belongsTo(db.User);
+
+
+// Sync all models
+connection.sync({ alter: true })
+  .then(() => {
+    console.log("Database & tables created!");
+  })
+  .catch(err => {
+    console.error("error syncing database", err);
+  });
+
+
 
 module.exports.db = db;
